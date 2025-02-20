@@ -1,9 +1,10 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { Idol } from '../types';
 import { DragTypes } from '../App';
 import { Trash2, Edit2 } from 'react-feather';
+import { IdolTooltip } from './IdolTooltip';
 
 interface DraggableIdolProps {
   idol: Idol;
@@ -23,6 +24,8 @@ export const DraggableIdol: React.FC<DraggableIdolProps> = ({
   onConfirmDelete,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
+  const [tooltipStyle, setTooltipStyle] = useState({ top: 0, right: 0 });
+  const [showTooltip, setShowTooltip] = useState(false);
 
   const [{ isDragging }, drag, preview] = useDrag<Idol, unknown, { isDragging: boolean }>(() => ({
     type: DragTypes.IDOL,
@@ -42,11 +45,26 @@ export const DraggableIdol: React.FC<DraggableIdolProps> = ({
     onDragStateChange?.(isDragging);
   }, [isDragging, onDragStateChange]);
 
+  // Update tooltip position when showing
+  useEffect(() => {
+    if (showTooltip && ref.current) {
+      const rect = ref.current.getBoundingClientRect();
+      setTooltipStyle({
+        top: rect.top,
+        right: window.innerWidth - rect.left + 8,
+      });
+    }
+  }, [showTooltip]);
+
   // Apply the drag ref
   drag(ref);
 
   return (
-    <div className='relative'>
+    <div
+      className='relative'
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
+    >
       <div
         ref={ref}
         className={`
@@ -89,6 +107,17 @@ export const DraggableIdol: React.FC<DraggableIdolProps> = ({
           <div className='text-xs text-red-300 mt-1'>Click again to confirm delete</div>
         )}
       </div>
+
+      {/* Tooltip */}
+      {showTooltip && (
+        <IdolTooltip
+          idol={idol}
+          style={{
+            top: tooltipStyle.top,
+            right: tooltipStyle.right,
+          }}
+        />
+      )}
     </div>
   );
 };

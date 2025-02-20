@@ -2,7 +2,8 @@ import React, { useRef, useState, useEffect } from 'react';
 import { useDrop, useDrag } from 'react-dnd';
 import { Grid, GridCell, Idol } from '../types';
 import { DragTypes } from '../App';
-import { IdolPreview } from './IdolPreview';
+import { GridIdol } from './GridIdol';
+import { IdolTooltip } from './IdolTooltip';
 import { Trash2 } from 'react-feather';
 
 // Initial grid configuration based on the image
@@ -114,9 +115,10 @@ const GridCellComponent: React.FC<GridCellProps> = ({
   isValidTarget,
   onClick,
   placedIdol,
-  onDragStart,
 }) => {
   const previewRef = useRef<HTMLDivElement>(null);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   // Check if this cell is part of the idol
   const isPartOfIdol =
@@ -146,6 +148,13 @@ const GridCellComponent: React.FC<GridCellProps> = ({
     [placedIdol, cell.x, cell.y, isPartOfIdol]
   );
 
+  // Handle mouse movement for tooltip positioning
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    }
+  };
+
   return (
     <div
       ref={(node) => {
@@ -164,6 +173,9 @@ const GridCellComponent: React.FC<GridCellProps> = ({
         transition-colors duration-150
       `}
       onClick={() => onClick?.(cell)}
+      onMouseEnter={() => !isDragging && setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
+      onMouseMove={handleMouseMove}
     >
       {shouldRenderIdol && (
         <div
@@ -175,8 +187,19 @@ const GridCellComponent: React.FC<GridCellProps> = ({
             opacity: isDragging ? 0.5 : 1,
           }}
         >
-          <IdolPreview idol={placedIdol} className='w-full h-full' />
+          <GridIdol idol={placedIdol} className='w-full h-full' />
         </div>
+      )}
+
+      {/* Tooltip */}
+      {showTooltip && shouldRenderIdol && !isDragging && placedIdol && (
+        <IdolTooltip
+          idol={placedIdol}
+          style={{
+            top: mousePos.y,
+            right: window.innerWidth - mousePos.x + 16,
+          }}
+        />
       )}
     </div>
   );
@@ -268,7 +291,7 @@ export const IdolGrid: React.FC<GridProps> = ({
           setDragItem(null);
         }
       },
-      drop: (item, monitor) => {
+      drop: (item) => {
         if (!hoverCell) return;
         if (canPlaceIdol(grid, item, hoverCell, placedIdols)) {
           onIdolDrop?.(item, hoverCell);
@@ -277,7 +300,7 @@ export const IdolGrid: React.FC<GridProps> = ({
         setHoverCell(null);
         setDragItem(null);
       },
-      canDrop: (item, monitor) => {
+      canDrop: (item) => {
         return hoverCell ? canPlaceIdol(grid, item, hoverCell, placedIdols) : false;
       },
       collect: (monitor) => ({

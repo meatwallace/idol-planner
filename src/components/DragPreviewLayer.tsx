@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDragLayer } from 'react-dnd';
 import { Idol } from '../types';
-import { IdolPreview } from './IdolPreview';
+import { GridIdol } from './GridIdol';
 
 export const DragPreviewLayer: React.FC = () => {
   const { isDragging, item, currentOffset } = useDragLayer((monitor) => ({
@@ -25,7 +25,7 @@ export const DragPreviewLayer: React.FC = () => {
         transform: `translate(${currentOffset.x}px, ${currentOffset.y}px)`,
       }}
     >
-      <IdolPreview idol={item} />
+      <GridIdol idol={item} />
     </div>
   );
 };

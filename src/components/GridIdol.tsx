@@ -9,7 +9,7 @@ import atlasRelic2x1 from '../images/AtlasRelic2x1.webp';
 import atlasRelic2x2 from '../images/AtlasRelic2x2.webp';
 import atlasRelic3x1 from '../images/AtlasRelic3x1.webp';
 
-interface IdolPreviewProps {
+interface GridIdolProps {
   idol: Idol;
   className?: string;
 }
@@ -24,7 +24,7 @@ const sizeToImage: Record<string, string> = {
   '3x1': atlasRelic3x1,
 };
 
-export const IdolPreview: React.FC<IdolPreviewProps> = ({ idol, className = '' }) => {
+export const GridIdol: React.FC<GridIdolProps> = ({ idol, className = '' }) => {
   // Each grid cell is roughly 50px based on the grid container width of 300px
   // and 6 columns with a small gap
   const CELL_SIZE = 48;

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { X, Plus, Trash2, Search } from 'react-feather';
+import { X, Trash2, Search } from 'react-feather';
 import { IdolSize, IdolModifier, Idol, ModifierType } from '../types';
 import { useModifierData } from '../hooks/useModifierData';
 import { createId } from '@paralleldrive/cuid2';

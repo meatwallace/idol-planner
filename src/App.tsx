@@ -2,7 +2,7 @@ import { IdolGrid } from './components/Grid';
 import { IdolInventory } from './components/IdolInventory';
 import { IdolConfigForm } from './components/IdolConfigForm';
 import { DragPreviewLayer } from './components/DragPreviewLayer';
-import { GridCell, Idol, Grid, IdolModifier, ModifierType } from './types';
+import { GridCell, Idol, Grid, ModifierType } from './types';
 import { useState, useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -147,7 +147,6 @@ function App() {
   const [idols, setIdols] = useState<Idol[]>([]);
   const [grid, setGrid] = useState<Grid>(INITIAL_GRID);
   const [editingIdol, setEditingIdol] = useState<Idol | undefined>();
-  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [showShareNotification, setShowShareNotification] = useState(false);
 
@@ -225,7 +224,6 @@ function App() {
 
   const handleDeleteIdol = (id: string) => {
     setIdols((prev) => prev.filter((idol) => idol.id !== id));
-    setDeleteConfirmId(null);
   };
 
   const handleCellClick = (cell: GridCell) => {
