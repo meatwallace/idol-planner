@@ -147,6 +147,13 @@ function App() {
   const [idols, setIdols] = useState<Idol[]>([]);
   const [grid, setGrid] = useState<Grid>(INITIAL_GRID);
 
+  const handleClearGrid = () => {
+    // Reset grid to initial state
+    setGrid(INITIAL_GRID);
+    // Remove all placed idols
+    setIdols((prev) => prev.filter((idol) => !idol.position));
+  };
+
   // Load initial state from URL
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -286,13 +293,19 @@ function App() {
             <div className='flex-1 flex flex-col'>
               {/* Grid Container */}
               <div className='flex-1 flex flex-col items-center p-8 space-y-8'>
-                <div className='w-[300px]'>
+                <div className='w-[300px] relative'>
                   <IdolGrid
                     grid={grid}
                     onCellClick={handleCellClick}
                     onIdolDrop={handleIdolDrop}
                     placedIdols={placedIdols}
                   />
+                  <button
+                    onClick={handleClearGrid}
+                    className='absolute -bottom-8 right-0 px-3 py-1.5 text-xs bg-red-900/30 hover:bg-red-800/40 rounded text-red-300'
+                  >
+                    Clear Grid
+                  </button>
                 </div>
 
                 {/* Modifier List */}
