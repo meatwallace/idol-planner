@@ -111,10 +111,27 @@ The Idol system in Path of Exile allows players to socket special items called "
 - [x] Basic grid layout (6x7)
 - [x] Active/inactive cell visualization
 - [x] Grid cell hover states
-- [ ] Grid cell click handling
-- [ ] Basic layout structure (grid, sidebar, bottom panel)
+- [x] Grid cell click handling
+- [x] Basic layout structure (grid, sidebar, bottom panel)
 
-### Phase 2: Idol Configuration
+### Phase 2: Inventory UI Implementation ✅
+
+- [x] Collapsible sidebar implementation
+  - [x] Expand/collapse animation
+  - [x] Toggle button with icon
+  - [x] Smooth width transition
+  - [x] Full-height layout
+- [x] Inventory header
+  - [x] Title when expanded
+  - [x] Create idol button
+  - [x] Consistent visibility in both states
+- [x] Empty state messaging
+- [x] Focus management
+  - [x] Overlay backdrop effect
+  - [x] Proper z-index layering
+  - [x] Smooth opacity transitions
+
+### Phase 3: Idol Configuration (Next)
 
 - [ ] Configuration Panel UI
   - [ ] Basic form layout
@@ -128,19 +145,6 @@ The Idol system in Path of Exile allows players to socket special items called "
   - [ ] Save template to inventory
   - [ ] Edit existing template
   - [ ] Delete template confirmation
-
-### Phase 3: Inventory System
-
-- [ ] State Management
-  - [ ] Set up React Context for inventory
-  - [ ] Template CRUD operations
-  - [ ] Instance management
-- [ ] Inventory Sidebar UI
-  - [ ] List view of saved templates
-  - [ ] Template preview cards
-  - [ ] Drag handles
-  - [ ] Quick actions (edit/delete)
-  - [ ] Search/filter input
 
 ### Phase 4: Drag and Drop
 
@@ -212,8 +216,12 @@ The Idol system in Path of Exile allows players to socket special items called "
 
 ## Current Focus
 
-Currently implementing Phase 1: Core Grid Implementation. Next steps:
+Moving from Phase 2 (Inventory UI) to Phase 3 (Idol Configuration). Next steps:
 
-1. Complete grid cell interactions
-2. Set up basic layout structure
-3. Begin idol configuration panel
+1. Implement idol configuration form
+2. Add idol preview
+   Currently implementing Phase 1: Core Grid Implementation. Next steps:
+
+3. Complete grid cell interactions
+4. Set up basic layout structure
+5. Begin idol configuration panel
