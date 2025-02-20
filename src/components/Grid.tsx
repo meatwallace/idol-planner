@@ -156,7 +156,7 @@ const GridCellComponent: React.FC<GridCellProps> = ({
       }}
       className={`
         aspect-square rounded relative
-        ${cell.isActive ? 'bg-amber-700/30 cursor-pointer hover:bg-amber-600/40' : 'bg-stone-800/50'}
+        ${cell.isActive ? 'bg-slate-700/30 cursor-pointer hover:bg-slate-600/40' : 'bg-stone-900/50'}
         ${cell.isOccupied && !shouldRenderIdol ? 'opacity-50' : ''}
         ${isPreview && isValidTarget ? 'bg-green-600/40' : ''}
         ${isPreview && !isValidTarget ? 'bg-red-600/40' : ''}
@@ -165,11 +165,6 @@ const GridCellComponent: React.FC<GridCellProps> = ({
       `}
       onClick={() => onClick?.(cell)}
     >
-      {cell.isActive && !isPreview && !placedIdol && (
-        <div className='w-full h-full flex items-center justify-center'>
-          <div className='w-3 h-3 bg-amber-600/40 rounded-sm' />
-        </div>
-      )}
       {shouldRenderIdol && (
         <div
           ref={previewRef}
@@ -383,12 +378,6 @@ export const IdolGrid: React.FC<GridProps> = ({
 
       {/* Delete Zone */}
       <DeleteZone onDelete={handleDelete} />
-
-      {/* Decorative corners */}
-      <div className='absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-amber-700/60 rounded-tl-lg' />
-      <div className='absolute -top-1 -right-1 w-4 h-4 border-t-2 border-r-2 border-amber-700/60 rounded-tr-lg' />
-      <div className='absolute -bottom-1 -left-1 w-4 h-4 border-b-2 border-l-2 border-amber-700/60 rounded-bl-lg' />
-      <div className='absolute -bottom-1 -right-1 w-4 h-4 border-b-2 border-r-2 border-amber-700/60 rounded-br-lg' />
     </div>
   );
 };

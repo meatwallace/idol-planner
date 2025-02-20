@@ -45,7 +45,7 @@ export const IdolPreview: React.FC<IdolPreviewProps> = ({ idol, className = '' }
     <div
       className={`
         rounded relative overflow-hidden
-        ${isPlaced ? 'bg-amber-700' : 'bg-amber-700/30 border border-amber-600/40'}
+        ${isPlaced ? 'bg-slate-700' : 'bg-slate-700/30 border border-slate-600/40'}
         ${className}
       `}
       style={{

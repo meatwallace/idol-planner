@@ -38,26 +38,41 @@ export const ModifierList: React.FC<ModifierListProps> = ({ idols, className = '
     });
   }, [idols]);
 
+  // Function to process modifier text and calculate totals
+  const processModifierText = (text: string, count: number): string => {
+    // Match patterns like "+25%" or "-10%"
+    const percentageMatch = text.match(/([+-])(\d+)%/);
+    if (percentageMatch) {
+      const [fullMatch, sign, number] = percentageMatch;
+      const totalValue = parseInt(number) * count;
+      // Replace the percentage in the text with the calculated total
+      return text.replace(fullMatch, `${sign}${totalValue}%`);
+    }
+    return text;
+  };
+
   if (aggregatedModifiers.length === 0) {
     return null;
   }
 
   return (
     <div className={`bg-stone-900 border border-stone-800 rounded-lg p-4 ${className}`}>
-      <h3 className='text-sm font-medium mb-3'>Active Modifiers</h3>
+      <h3 className='text-xs font-medium mb-3'>Active Modifiers</h3>
       <div className='flex flex-col gap-2 max-w-md mx-auto'>
-        {aggregatedModifiers.map((modifier) => (
-          <div
-            key={`${modifier.type}-${modifier.text}`}
-            className={`
-              text-sm rounded px-3 py-2 flex items-center justify-between
-              ${modifier.type === 'prefix' ? 'bg-blue-900/30' : 'bg-purple-900/30'}
-            `}
-          >
-            <span>{modifier.text}</span>
-            <span className='ml-3 text-sm opacity-70'>{modifier.count}×</span>
-          </div>
-        ))}
+        {aggregatedModifiers.map((modifier) => {
+          const displayText = processModifierText(modifier.text, modifier.count);
+          return (
+            <div
+              key={`${modifier.type}-${modifier.text}`}
+              className={`
+                text-xs rounded px-3 py-1.5
+                ${modifier.type === 'prefix' ? 'bg-blue-900/30' : 'bg-purple-900/30'}
+              `}
+            >
+              {displayText}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

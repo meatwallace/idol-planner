@@ -37,10 +37,10 @@ interface SectionHeaderProps {
 }
 
 const SectionHeader: React.FC<SectionHeaderProps> = ({ size, image, name }) => (
-  <div className='flex items-center gap-2 py-2 px-1 border-b border-stone-800'>
+  <div className='flex items-center gap-2 py-2 px-2 border-b border-stone-800'>
     <img src={image} alt={name} className='w-5 h-5 object-contain opacity-70' />
-    <div className='text-xs font-medium text-stone-300 flex-1'>{name}</div>
-    <div className='text-xs text-stone-500 pr-2'>
+    <div className='text-xs font-medium text-stone-300 flex-1 min-[900px]:block hidden'>{name}</div>
+    <div className='text-xs text-stone-400 min-[900px]:block hidden'>
       {size.width}x{size.height}
     </div>
   </div>
@@ -74,13 +74,13 @@ export const IdolInventory: React.FC<IdolInventoryProps> = ({
   }));
 
   return (
-    <div className='absolute top-0 right-0 h-full'>
+    <div className='fixed top-0 right-0 h-screen'>
       <div
         className={`
           flex flex-col
-          h-full
+          h-screen
           transition-all duration-300 ease-in-out
-          ${isCollapsed ? 'w-12' : 'w-64'}
+          ${isCollapsed ? 'w-12 min-[900px]:w-64' : 'w-64'}
           bg-stone-900 border-l border-stone-800
           shadow-xl
           relative z-10
@@ -88,62 +88,66 @@ export const IdolInventory: React.FC<IdolInventoryProps> = ({
       >
         <button
           onClick={onToggleCollapse}
-          className='absolute -left-3 top-4 bg-stone-900 border border-stone-800 rounded-full p-1 hover:bg-stone-800 cursor-pointer z-10'
+          className='absolute -left-3 top-4 bg-stone-900 border border-stone-800 rounded-full p-1 hover:bg-stone-800 cursor-pointer z-10 min-[900px]:hidden'
         >
           {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
         </button>
 
         <div className='flex-1 flex flex-col'>
           <div className='p-4 border-b border-stone-800 flex items-center justify-between'>
-            {!isCollapsed && <h2 className='font-semibold'>Idols</h2>}
+            <h2 className={`font-semibold ${isCollapsed ? 'hidden min-[900px]:inline-block' : ''}`}>
+              Idols
+            </h2>
             <button
               onClick={() => onCreateIdol()}
-              className='ml-auto bg-amber-700/30 hover:bg-amber-600/40 rounded p-2'
+              className={`bg-blue-700/30 hover:bg-blue-600/40 rounded p-2 ${
+                isCollapsed ? 'mx-auto min-[900px]:ml-auto' : 'ml-auto'
+              }`}
               title='Create New Idol'
             >
               <Plus size={16} />
             </button>
           </div>
 
-          {!isCollapsed && (
-            <div className='flex-1 overflow-y-auto'>
-              {idols.length === 0 ? (
-                <div className='text-stone-400 text-sm text-center flex items-center justify-center h-full'>
-                  <div>
-                    No idols created yet.
-                    <br />
-                    Click the + button to create one.
-                  </div>
+          <div
+            className={`flex-1 overflow-y-auto ${isCollapsed ? 'hidden min-[900px]:block' : ''}`}
+          >
+            {idols.length === 0 ? (
+              <div className='text-stone-400 text-sm text-center flex items-center justify-center h-full p-4'>
+                <div>
+                  No idols created yet.
+                  <br />
+                  Click the + button to create one.
                 </div>
-              ) : (
-                <div className='flex flex-col divide-y divide-stone-800/50'>
-                  {groupedIdols.map((section) =>
-                    section.idols.length > 0 ? (
-                      <div
-                        key={`${section.size.width}x${section.size.height}`}
-                        className='flex flex-col'
-                      >
-                        <SectionHeader
-                          size={section.size}
-                          image={section.image}
-                          name={section.name}
-                        />
-                        <div className='flex flex-col py-1'>
-                          {section.idols.map((idol) => (
-                            <DraggableIdol
-                              key={idol.id}
-                              idol={idol}
-                              onDragStateChange={handleDragStateChange}
-                            />
-                          ))}
-                        </div>
+              </div>
+            ) : (
+              <div className='flex flex-col divide-y divide-stone-800/50'>
+                {groupedIdols.map((section) =>
+                  section.idols.length > 0 ? (
+                    <div
+                      key={`${section.size.width}x${section.size.height}`}
+                      className='flex flex-col'
+                    >
+                      <SectionHeader
+                        size={section.size}
+                        image={section.image}
+                        name={section.name}
+                      />
+                      <div className='flex flex-col py-1'>
+                        {section.idols.map((idol) => (
+                          <DraggableIdol
+                            key={idol.id}
+                            idol={idol}
+                            onDragStateChange={handleDragStateChange}
+                          />
+                        ))}
                       </div>
-                    ) : null
-                  )}
-                </div>
-              )}
-            </div>
-          )}
+                    </div>
+                  ) : null
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

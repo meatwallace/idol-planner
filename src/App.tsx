@@ -2,8 +2,7 @@ import { IdolGrid } from './components/Grid';
 import { IdolInventory } from './components/IdolInventory';
 import { IdolConfigForm } from './components/IdolConfigForm';
 import { DragPreviewLayer } from './components/DragPreviewLayer';
-import { ModifierList } from './components/ModifierList';
-import { GridCell, Idol, Grid, IdolModifier } from './types';
+import { GridCell, Idol, Grid } from './types';
 import { useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -88,16 +87,12 @@ function App() {
     setIsInventoryCollapsed(false);
   };
 
-  const handleAddIdol = (
-    name: string,
-    size: { width: number; height: number },
-    modifiers: IdolModifier[]
-  ) => {
+  const handleAddIdol = (name: string, size: { width: number; height: number }) => {
     const newIdol: Idol = {
       id: crypto.randomUUID(),
       name,
       size,
-      modifiers,
+      modifiers: [],
     };
 
     setIdols((prev) => [...prev, newIdol]);
@@ -165,7 +160,7 @@ function App() {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className='min-h-screen bg-stone-950 text-white'>
+      <div className='relative min-h-screen bg-stone-950 text-white'>
         {/* Drag Preview Layer */}
         <DragPreviewLayer />
 
@@ -175,14 +170,16 @@ function App() {
             fixed inset-0 bg-stone-950
             transition-all duration-300 ease-in-out
             pointer-events-none z-10
+            min-[900px]:hidden
             ${!isInventoryCollapsed ? 'opacity-50' : 'opacity-0'}
           `}
         />
 
-        <div className='min-h-screen flex flex-col'>
+        <div className='h-screen flex flex-col'>
           {/* Header */}
-          <header className='p-8'>
-            <h1 className='text-3xl font-bold'>Idol Planner</h1>
+          <header className='p-4 text-center'>
+            <h1 className='text-xl font-bold text-stone-200'>Legacy of Phrecia</h1>
+            <h2 className='text-3xl font-bold'>Idol Planner</h2>
           </header>
 
           {/* Main Content */}
@@ -190,7 +187,7 @@ function App() {
             {/* Left Side - Grid and Form */}
             <div className='flex-1 flex flex-col'>
               {/* Grid Container */}
-              <div className='flex-1 flex flex-col items-center p-8 space-y-8'>
+              <div className='flex-1 flex items-start justify-center p-8'>
                 <div className='w-[300px]'>
                   <IdolGrid
                     grid={grid}
@@ -198,11 +195,6 @@ function App() {
                     onIdolDrop={handleIdolDrop}
                     placedIdols={placedIdols}
                   />
-                </div>
-
-                {/* Modifier List */}
-                <div className='w-full max-w-4xl'>
-                  <ModifierList idols={idols} />
                 </div>
               </div>
 

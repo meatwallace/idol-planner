@@ -313,7 +313,7 @@ export const IdolConfigForm: React.FC<IdolConfigFormProps> = ({
                   onChange={handleNameChange}
                   className={`
                     w-full bg-stone-800 border rounded px-2 py-1.5 text-sm
-                    focus:outline-none focus:border-amber-600
+                    focus:outline-none focus:border-blue-600
                     ${errors.name ? 'border-red-500' : 'border-stone-700'}
                   `}
                   placeholder='Enter idol name...'
@@ -338,7 +338,7 @@ export const IdolConfigForm: React.FC<IdolConfigFormProps> = ({
                           ${
                             formData.size.width === size.width &&
                             formData.size.height === size.height
-                              ? 'bg-amber-700/30 border-amber-600'
+                              ? 'bg-blue-700/30 border-blue-600'
                               : 'bg-stone-800 border-stone-700 hover:bg-stone-700'
                           }
                         `}
@@ -435,7 +435,7 @@ export const IdolConfigForm: React.FC<IdolConfigFormProps> = ({
                 </button>
                 <button
                   type='submit'
-                  className='px-3 py-1.5 text-sm bg-amber-700/30 hover:bg-amber-600/40 rounded'
+                  className='px-3 py-1.5 text-sm bg-blue-700/30 hover:bg-blue-600/40 rounded'
                 >
                   {isEditing ? 'Save Changes' : 'Create Idol'}
                 </button>
