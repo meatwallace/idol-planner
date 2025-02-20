@@ -392,7 +392,15 @@ function App() {
           {/* Header */}
           <header className='p-4 text-center'>
             <h1 className='text-xl font-bold text-stone-200'>Legacy of Phrecia</h1>
-            <h2 className='text-3xl font-bold'>Idol Planner</h2>
+            <h2 className='text-3xl font-bold my-1'>Idol Planner</h2>
+            <p className='text-xs text-stone-400'>
+              SCUFFED, SORRY. ALSO NO UNIQUE IDOLS (PROBABLY EVER) 🤭
+            </p>
+            <p className='text-xs text-stone-400 underline'>
+              <a href='https://github.com/meatwallace/idol-planner'>
+                https://github.com/meatwallace/idol-planner
+              </a>
+            </p>
           </header>
 
           {/* Main Content */}
