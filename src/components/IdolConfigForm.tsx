@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { X } from 'react-feather';
-import { IdolSize } from '../types';
+import { X, Plus, Trash2, Search } from 'react-feather';
+import { IdolSize, IdolModifier, ModifierType } from '../types';
+import { useModifierData } from '../hooks/useModifierData';
+import Fuse from 'fuse.js';
 
 // Import all idol images
 import atlasRelic1x1 from '../images/AtlasRelic1x1.webp';
@@ -13,13 +15,14 @@ import atlasRelic3x1 from '../images/AtlasRelic3x1.webp';
 interface IdolConfigFormProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddIdol: (name: string, size: IdolSize) => void;
+  onAddIdol: (name: string, size: IdolSize, modifiers: IdolModifier[]) => void;
   isEditing?: boolean;
 }
 
 interface IdolFormData {
   name: string;
   size: IdolSize;
+  modifiers: IdolModifier[];
 }
 
 // Map of size dimensions to display names and images
@@ -41,6 +44,82 @@ const AVAILABLE_SIZES: IdolSize[] = [
   { width: 3, height: 1 }, // Burial Idol
 ];
 
+interface ModifierSearchProps {
+  type: ModifierType;
+  options: string[];
+  onSelect: (text: string) => void;
+  onClose: () => void;
+}
+
+const ModifierSearch: React.FC<ModifierSearchProps> = ({ type, options, onSelect, onClose }) => {
+  const [search, setSearch] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+  const fuse = useRef(
+    new Fuse(options, {
+      includeScore: true,
+      threshold: 0.4,
+      minMatchCharLength: 2,
+      findAllMatches: true,
+      ignoreLocation: true,
+      useExtendedSearch: true,
+    })
+  );
+
+  useEffect(() => {
+    inputRef.current?.focus();
+    fuse.current = new Fuse(options, {
+      includeScore: true,
+      threshold: 0.4,
+      minMatchCharLength: 2,
+      findAllMatches: true,
+      ignoreLocation: true,
+      useExtendedSearch: true,
+    });
+  }, [options]);
+
+  const results = search
+    ? fuse.current
+        .search(search)
+        .slice(0, 10)
+        .map((result) => result.item)
+    : options.slice(0, 10);
+
+  return (
+    <div className='absolute inset-x-0 top-0 bg-stone-900 border border-stone-700 rounded-lg shadow-xl z-10'>
+      <div className='p-2 border-b border-stone-800'>
+        <div className='relative'>
+          <Search size={14} className='absolute left-2 top-1/2 -translate-y-1/2 text-stone-400' />
+          <input
+            ref={inputRef}
+            type='text'
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className='w-full bg-stone-800 border border-stone-700 rounded pl-8 pr-2 py-1 text-sm'
+            placeholder={`Search ${type}s...`}
+          />
+        </div>
+      </div>
+      <div className='max-h-48 overflow-y-auto'>
+        {results.map((text) => (
+          <button
+            key={text}
+            onClick={() => {
+              onSelect(text);
+              onClose();
+            }}
+            className={`
+              w-full text-left px-2 py-1.5 text-sm hover:bg-stone-800
+              ${type === 'prefix' ? 'text-blue-300' : 'text-purple-300'}
+            `}
+          >
+            {text}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
 export const IdolConfigForm: React.FC<IdolConfigFormProps> = ({
   isOpen,
   onClose,
@@ -51,13 +130,33 @@ export const IdolConfigForm: React.FC<IdolConfigFormProps> = ({
   const [formData, setFormData] = useState<IdolFormData>({
     name: '',
     size: AVAILABLE_SIZES[0],
+    modifiers: [],
   });
-  const [errors, setErrors] = useState<{ name?: string }>({});
+  const [errors, setErrors] = useState<{
+    name?: string;
+    modifiers?: string;
+  }>({});
+  const [activeSearch, setActiveSearch] = useState<{
+    type: ModifierType;
+    id: string;
+  } | null>(null);
+
+  const modifierData = useModifierData(formData.size);
+
+  // Get available modifiers (excluding already selected ones)
+  const availableModifiers = {
+    prefixes: modifierData.prefixes.filter(
+      (mod) => !formData.modifiers.some((m) => m.type === 'prefix' && m.text === mod)
+    ),
+    suffixes: modifierData.suffixes.filter(
+      (mod) => !formData.modifiers.some((m) => m.type === 'suffix' && m.text === mod)
+    ),
+  };
 
   // Reset form when opening
   useEffect(() => {
     if (isOpen) {
-      setFormData({ name: '', size: AVAILABLE_SIZES[0] });
+      setFormData({ name: '', size: AVAILABLE_SIZES[0], modifiers: [] });
       setErrors({});
       nameInputRef.current?.focus();
     }
@@ -65,7 +164,6 @@ export const IdolConfigForm: React.FC<IdolConfigFormProps> = ({
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, name: e.target.value }));
-    // Clear name error when user starts typing
     if (errors.name) {
       setErrors((prev) => ({ ...prev, name: undefined }));
     }
@@ -75,13 +173,69 @@ export const IdolConfigForm: React.FC<IdolConfigFormProps> = ({
     setFormData((prev) => ({ ...prev, size }));
   };
 
+  const handleAddModifier = (type: ModifierType) => {
+    const prefixCount = formData.modifiers.filter((m) => m.type === 'prefix').length;
+    const suffixCount = formData.modifiers.filter((m) => m.type === 'suffix').length;
+
+    if (type === 'prefix') {
+      if (prefixCount >= 2) {
+        setErrors((prev) => ({ ...prev, modifiers: 'Maximum 2 prefixes allowed' }));
+        return;
+      }
+      if (availableModifiers.prefixes.length === 0) {
+        setErrors((prev) => ({ ...prev, modifiers: 'No more prefixes available' }));
+        return;
+      }
+    }
+
+    if (type === 'suffix') {
+      if (suffixCount >= 2) {
+        setErrors((prev) => ({ ...prev, modifiers: 'Maximum 2 suffixes allowed' }));
+        return;
+      }
+      if (availableModifiers.suffixes.length === 0) {
+        setErrors((prev) => ({ ...prev, modifiers: 'No more suffixes available' }));
+        return;
+      }
+    }
+
+    const id = crypto.randomUUID();
+    setFormData((prev) => ({
+      ...prev,
+      modifiers: [...prev.modifiers, { id, type, text: '' }],
+    }));
+    setActiveSearch({ type, id });
+    setErrors((prev) => ({ ...prev, modifiers: undefined }));
+  };
+
+  const handleModifierSelect = (id: string, text: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      modifiers: prev.modifiers.map((m) => (m.id === id ? { ...m, text } : m)),
+    }));
+  };
+
+  const handleRemoveModifier = (id: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      modifiers: prev.modifiers.filter((m) => m.id !== id),
+    }));
+    setErrors((prev) => ({ ...prev, modifiers: undefined }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validate form
-    const newErrors: { name?: string } = {};
+    const newErrors: { name?: string; modifiers?: string } = {};
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required';
+    }
+
+    if (formData.modifiers.length === 0) {
+      newErrors.modifiers = 'At least one modifier is required';
+    } else if (formData.modifiers.some((m) => !m.text.trim())) {
+      newErrors.modifiers = 'All modifiers must have text';
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -89,7 +243,11 @@ export const IdolConfigForm: React.FC<IdolConfigFormProps> = ({
       return;
     }
 
-    onAddIdol(formData.name.trim(), formData.size);
+    onAddIdol(
+      formData.name.trim(),
+      formData.size,
+      formData.modifiers.map((m) => ({ ...m, text: m.text.trim() }))
+    );
   };
 
   if (!isOpen) return null;
@@ -173,6 +331,72 @@ export const IdolConfigForm: React.FC<IdolConfigFormProps> = ({
                       </button>
                     );
                   })}
+                </div>
+              </div>
+
+              {/* Modifiers */}
+              <div className='space-y-2'>
+                <div className='flex items-center justify-between'>
+                  <label className='block text-sm font-medium'>Modifiers</label>
+                  <div className='flex gap-1.5'>
+                    <button
+                      type='button'
+                      onClick={() => handleAddModifier('prefix')}
+                      className='text-xs px-2 py-1 rounded bg-blue-900/30 hover:bg-blue-800/30'
+                    >
+                      Add Prefix
+                    </button>
+                    <button
+                      type='button'
+                      onClick={() => handleAddModifier('suffix')}
+                      className='text-xs px-2 py-1 rounded bg-purple-900/30 hover:bg-purple-800/30'
+                    >
+                      Add Suffix
+                    </button>
+                  </div>
+                </div>
+
+                {errors.modifiers && <p className='text-red-500 text-xs'>{errors.modifiers}</p>}
+
+                <div className='space-y-1.5'>
+                  {formData.modifiers.map((modifier) => (
+                    <div key={modifier.id} className='relative'>
+                      <div
+                        className={`
+                          flex items-center gap-2
+                          ${modifier.type === 'prefix' ? 'text-blue-300' : 'text-purple-300'}
+                        `}
+                      >
+                        <button
+                          type='button'
+                          onClick={() => setActiveSearch({ type: modifier.type, id: modifier.id })}
+                          className='flex-1 bg-stone-800 border border-stone-700 rounded px-2 py-1.5 text-sm text-left hover:bg-stone-700'
+                        >
+                          {modifier.text || `Click to select ${modifier.type}...`}
+                        </button>
+                        <button
+                          type='button'
+                          onClick={() => handleRemoveModifier(modifier.id)}
+                          className='text-stone-400 hover:text-white'
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+
+                      {activeSearch?.id === modifier.id && (
+                        <ModifierSearch
+                          type={modifier.type}
+                          options={
+                            modifier.type === 'prefix'
+                              ? availableModifiers.prefixes
+                              : availableModifiers.suffixes
+                          }
+                          onSelect={(text) => handleModifierSelect(modifier.id, text)}
+                          onClose={() => setActiveSearch(null)}
+                        />
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
 

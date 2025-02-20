@@ -21,6 +21,14 @@ export type IdolSize = {
   height: number;
 };
 
+export type ModifierType = 'prefix' | 'suffix';
+
+export type IdolModifier = {
+  id: string;
+  type: ModifierType;
+  text: string;
+};
+
 export type Idol = {
   id: string;
   name: string;
@@ -29,4 +37,12 @@ export type Idol = {
     x: number;
     y: number;
   };
+  modifiers: IdolModifier[];
+};
+
+// Helper type for the modifier list display
+export type AggregatedModifier = {
+  text: string;
+  type: ModifierType;
+  count: number;
 };

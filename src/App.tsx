@@ -2,7 +2,8 @@ import { IdolGrid } from './components/Grid';
 import { IdolInventory } from './components/IdolInventory';
 import { IdolConfigForm } from './components/IdolConfigForm';
 import { DragPreviewLayer } from './components/DragPreviewLayer';
-import { GridCell, Idol, Grid } from './types';
+import { ModifierList } from './components/ModifierList';
+import { GridCell, Idol, Grid, IdolModifier } from './types';
 import { useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -87,11 +88,16 @@ function App() {
     setIsInventoryCollapsed(false);
   };
 
-  const handleAddIdol = (name: string, size: { width: number; height: number }) => {
+  const handleAddIdol = (
+    name: string,
+    size: { width: number; height: number },
+    modifiers: IdolModifier[]
+  ) => {
     const newIdol: Idol = {
       id: crypto.randomUUID(),
       name,
       size,
+      modifiers,
     };
 
     setIdols((prev) => [...prev, newIdol]);
@@ -184,7 +190,7 @@ function App() {
             {/* Left Side - Grid and Form */}
             <div className='flex-1 flex flex-col'>
               {/* Grid Container */}
-              <div className='flex-1 flex items-start justify-center p-8'>
+              <div className='flex-1 flex flex-col items-center p-8 space-y-8'>
                 <div className='w-[300px]'>
                   <IdolGrid
                     grid={grid}
@@ -192,6 +198,11 @@ function App() {
                     onIdolDrop={handleIdolDrop}
                     placedIdols={placedIdols}
                   />
+                </div>
+
+                {/* Modifier List */}
+                <div className='w-full max-w-4xl'>
+                  <ModifierList idols={idols} />
                 </div>
               </div>
 
