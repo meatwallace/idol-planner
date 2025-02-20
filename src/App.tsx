@@ -439,7 +439,7 @@ function App() {
               </a>
             </p>
             <p className='text-s text-stone-400 font-bold'>
-              !!! save your URLs before opening someone elses link !!!
+              !!! save your URLs before opening someone elses planner !!!
             </p>
           </header>
 
