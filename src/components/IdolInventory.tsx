@@ -19,6 +19,7 @@ interface IdolInventoryProps {
   onDragStart: () => void;
   onDragEnd: () => void;
   onDeleteIdol?: (id: string) => void;
+  onEditIdol?: (idol: Idol) => void;
 }
 
 // Map of size dimensions to image paths and display names
@@ -55,6 +56,7 @@ export const IdolInventory: React.FC<IdolInventoryProps> = ({
   onDragStart,
   onDragEnd,
   onDeleteIdol,
+  onEditIdol,
 }) => {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
@@ -144,6 +146,7 @@ export const IdolInventory: React.FC<IdolInventoryProps> = ({
                             idol={idol}
                             onDragStateChange={handleDragStateChange}
                             onDeleteClick={(id) => setDeleteConfirmId(id)}
+                            onEditClick={onEditIdol}
                             showDeleteConfirm={deleteConfirmId === idol.id}
                             onConfirmDelete={onDeleteIdol}
                           />

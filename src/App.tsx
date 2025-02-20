@@ -146,6 +146,7 @@ function App() {
   const [isConfigFormOpen, setIsConfigFormOpen] = useState(false);
   const [idols, setIdols] = useState<Idol[]>([]);
   const [grid, setGrid] = useState<Grid>(INITIAL_GRID);
+  const [editingIdol, setEditingIdol] = useState<Idol | undefined>();
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   const handleClearGrid = () => {
@@ -207,6 +208,37 @@ function App() {
 
     setIdols((prev) => [...prev, newIdol]);
     setIsConfigFormOpen(false);
+  };
+
+  const handleEditIdol = (
+    id: string,
+    name: string,
+    size: { width: number; height: number },
+    modifiers: { type: ModifierType; text: string; code: string }[] = []
+  ) => {
+    setIdols((prev) =>
+      prev.map((idol) =>
+        idol.id === id
+          ? {
+              ...idol,
+              name,
+              size,
+              modifiers: modifiers.map((mod) => ({
+                ...mod,
+                id: createId(),
+              })),
+            }
+          : idol
+      )
+    );
+    setEditingIdol(undefined);
+    setIsConfigFormOpen(false);
+  };
+
+  const handleStartEdit = (idol: Idol) => {
+    setEditingIdol(idol);
+    setIsConfigFormOpen(true);
+    setIsInventoryCollapsed(false);
   };
 
   const handleIdolDrop = (idol: Idol, cell: GridCell) => {
@@ -323,8 +355,13 @@ function App() {
               {/* Configuration Form */}
               <IdolConfigForm
                 isOpen={isConfigFormOpen}
-                onClose={() => setIsConfigFormOpen(false)}
+                onClose={() => {
+                  setIsConfigFormOpen(false);
+                  setEditingIdol(undefined);
+                }}
                 onAddIdol={handleAddIdol}
+                onEditIdol={handleEditIdol}
+                editingIdol={editingIdol}
               />
             </div>
 
@@ -338,6 +375,7 @@ function App() {
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
                 onDeleteIdol={handleDeleteIdol}
+                onEditIdol={handleStartEdit}
               />
             </div>
           </main>

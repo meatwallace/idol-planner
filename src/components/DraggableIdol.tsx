@@ -3,12 +3,13 @@ import { useDrag } from 'react-dnd';
 import { getEmptyImage } from 'react-dnd-html5-backend';
 import { Idol } from '../types';
 import { DragTypes } from '../App';
-import { Trash2 } from 'react-feather';
+import { Trash2, Edit2 } from 'react-feather';
 
 interface DraggableIdolProps {
   idol: Idol;
   onDragStateChange?: (isDragging: boolean) => void;
   onDeleteClick?: (id: string) => void;
+  onEditClick?: (idol: Idol) => void;
   showDeleteConfirm?: boolean;
   onConfirmDelete?: (id: string) => void;
 }
@@ -17,6 +18,7 @@ export const DraggableIdol: React.FC<DraggableIdolProps> = ({
   idol,
   onDragStateChange,
   onDeleteClick,
+  onEditClick,
   showDeleteConfirm,
   onConfirmDelete,
 }) => {
@@ -55,23 +57,32 @@ export const DraggableIdol: React.FC<DraggableIdolProps> = ({
         <div className='flex items-center justify-between'>
           <div className='text-sm'>{idol.name}</div>
           {!idol.position && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                if (showDeleteConfirm) {
-                  onConfirmDelete?.(idol.id);
-                } else {
-                  onDeleteClick?.(idol.id);
-                }
-              }}
-              className={`
-                opacity-0 group-hover:opacity-100
-                transition-opacity duration-200
-                ${showDeleteConfirm ? 'text-red-300' : 'text-stone-400 hover:text-white'}
-              `}
-            >
-              <Trash2 size={14} />
-            </button>
+            <div className='flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200'>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEditClick?.(idol);
+                }}
+                className='text-stone-400 hover:text-white'
+              >
+                <Edit2 size={14} />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (showDeleteConfirm) {
+                    onConfirmDelete?.(idol.id);
+                  } else {
+                    onDeleteClick?.(idol.id);
+                  }
+                }}
+                className={`
+                  ${showDeleteConfirm ? 'text-red-300' : 'text-stone-400 hover:text-white'}
+                `}
+              >
+                <Trash2 size={14} />
+              </button>
+            </div>
           )}
         </div>
         {showDeleteConfirm && (

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { X, Plus, Trash2, Search } from 'react-feather';
-import { IdolSize, IdolModifier, ModifierType } from '../types';
+import { IdolSize, IdolModifier, Idol, ModifierType } from '../types';
 import { useModifierData } from '../hooks/useModifierData';
 import { createId } from '@paralleldrive/cuid2';
 import Fuse from 'fuse.js';
@@ -17,7 +17,8 @@ interface IdolConfigFormProps {
   isOpen: boolean;
   onClose: () => void;
   onAddIdol: (name: string, size: IdolSize, modifiers: IdolModifier[]) => void;
-  isEditing?: boolean;
+  onEditIdol?: (id: string, name: string, size: IdolSize, modifiers: IdolModifier[]) => void;
+  editingIdol?: Idol;
 }
 
 interface IdolFormData {
@@ -148,7 +149,8 @@ export const IdolConfigForm: React.FC<IdolConfigFormProps> = ({
   isOpen,
   onClose,
   onAddIdol,
-  isEditing = false,
+  onEditIdol,
+  editingIdol,
 }) => {
   const nameInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState<IdolFormData>({
@@ -177,14 +179,22 @@ export const IdolConfigForm: React.FC<IdolConfigFormProps> = ({
     ),
   };
 
-  // Reset form when opening
+  // Reset form when opening or when editingIdol changes
   useEffect(() => {
     if (isOpen) {
-      setFormData({ name: '', size: AVAILABLE_SIZES[0], modifiers: [] });
+      if (editingIdol) {
+        setFormData({
+          name: editingIdol.name,
+          size: editingIdol.size,
+          modifiers: editingIdol.modifiers,
+        });
+      } else {
+        setFormData({ name: '', size: AVAILABLE_SIZES[0], modifiers: [] });
+      }
       setErrors({});
       nameInputRef.current?.focus();
     }
-  }, [isOpen]);
+  }, [isOpen, editingIdol]);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, name: e.target.value }));
@@ -280,11 +290,21 @@ export const IdolConfigForm: React.FC<IdolConfigFormProps> = ({
       return;
     }
 
-    onAddIdol(
-      formData.name.trim(),
-      formData.size,
-      formData.modifiers.map((m) => ({ ...m, text: m.text.trim() }))
-    );
+    if (editingIdol) {
+      onEditIdol?.(
+        editingIdol.id,
+        formData.name.trim(),
+        formData.size,
+        formData.modifiers.map((m) => ({ ...m, text: m.text.trim() }))
+      );
+    } else {
+      onAddIdol(
+        formData.name.trim(),
+        formData.size,
+        formData.modifiers.map((m) => ({ ...m, text: m.text.trim() }))
+      );
+    }
+    onClose();
   };
 
   // Sort modifiers by type (prefixes first, then suffixes)
@@ -309,7 +329,7 @@ export const IdolConfigForm: React.FC<IdolConfigFormProps> = ({
             {/* Header */}
             <div className='flex items-center justify-between mb-3'>
               <h2 className='text-base font-semibold'>
-                {isEditing ? 'Edit Idol' : 'Create New Idol'}
+                {editingIdol ? 'Edit Idol' : 'Create New Idol'}
               </h2>
               <button
                 onClick={onClose}
@@ -458,7 +478,7 @@ export const IdolConfigForm: React.FC<IdolConfigFormProps> = ({
                   type='submit'
                   className='px-3 py-1.5 text-sm bg-blue-700/30 hover:bg-blue-600/40 rounded'
                 >
-                  {isEditing ? 'Save Changes' : 'Create Idol'}
+                  {editingIdol ? 'Save Changes' : 'Create Idol'}
                 </button>
               </div>
             </form>
