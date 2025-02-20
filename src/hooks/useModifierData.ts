@@ -31,8 +31,18 @@ export const useModifierData = (size?: IdolSize) => {
     const mods = IDOL_MODS[sizeKey as keyof typeof IDOL_MODS];
 
     return {
-      prefixes: (mods?.prefixes || []).map((mod: ModData) => mod.Mod),
-      suffixes: (mods?.suffixes || []).map((mod: ModData) => mod.Mod),
+      prefixes: (mods?.prefixes || []).map((mod: ModData) => ({
+        text: mod.Mod,
+        code: mod.Code,
+        name: mod.Name,
+        family: mod.Family,
+      })),
+      suffixes: (mods?.suffixes || []).map((mod: ModData) => ({
+        text: mod.Mod,
+        code: mod.Code,
+        name: mod.Name,
+        family: mod.Family,
+      })),
     };
   }, [size]);
 

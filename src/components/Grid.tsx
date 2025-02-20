@@ -156,10 +156,10 @@ const GridCellComponent: React.FC<GridCellProps> = ({
       }}
       className={`
         aspect-square rounded relative
-        ${cell.isActive ? 'bg-slate-700/30 cursor-pointer hover:bg-slate-600/40' : 'bg-stone-900/50'}
+        ${!isPreview && (cell.isActive ? 'bg-slate-700/30 cursor-pointer hover:bg-slate-600/40' : 'bg-stone-900/50')}
         ${cell.isOccupied && !shouldRenderIdol ? 'opacity-50' : ''}
-        ${isPreview && isValidTarget ? 'bg-green-600/40' : ''}
-        ${isPreview && !isValidTarget ? 'bg-red-600/40' : ''}
+        ${isPreview && isValidTarget ? 'bg-green-600/30 hover:bg-green-600/40' : ''}
+        ${isPreview && !isValidTarget ? 'bg-red-600/30 hover:bg-red-600/40' : ''}
         ${isPartOfIdol ? 'cursor-move' : ''}
         transition-colors duration-150
       `}
@@ -220,7 +220,7 @@ const DeleteZone: React.FC<DeleteZoneProps> = ({ onDelete }) => {
         ${isOver ? 'text-red-500' : ''}
       `}
     >
-      <Trash2 size={18} />
+      <Trash2 size={20} />
     </div>
   );
 };

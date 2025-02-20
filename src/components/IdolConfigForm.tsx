@@ -46,7 +46,12 @@ const AVAILABLE_SIZES: IdolSize[] = [
 
 interface ModifierSearchProps {
   type: ModifierType;
-  options: string[];
+  options: Array<{
+    text: string;
+    code: string;
+    name: string;
+    family: string;
+  }>;
   onSelect: (text: string) => void;
   onClose: () => void;
 }
@@ -57,6 +62,7 @@ const ModifierSearch: React.FC<ModifierSearchProps> = ({ type, options, onSelect
   const containerRef = useRef<HTMLDivElement>(null);
   const fuse = useRef(
     new Fuse(options, {
+      keys: ['text', 'name', 'family'],
       includeScore: true,
       threshold: 0.4,
       minMatchCharLength: 2,
@@ -69,6 +75,7 @@ const ModifierSearch: React.FC<ModifierSearchProps> = ({ type, options, onSelect
   useEffect(() => {
     inputRef.current?.focus();
     fuse.current = new Fuse(options, {
+      keys: ['text', 'name', 'family'],
       includeScore: true,
       threshold: 0.4,
       minMatchCharLength: 2,
@@ -116,11 +123,11 @@ const ModifierSearch: React.FC<ModifierSearchProps> = ({ type, options, onSelect
         </div>
       </div>
       <div className='max-h-48 overflow-y-auto'>
-        {results.map((text) => (
+        {results.map((mod) => (
           <button
-            key={text}
+            key={mod.code}
             onClick={() => {
-              onSelect(text);
+              onSelect(mod.text);
               onClose();
             }}
             className={`
@@ -128,7 +135,7 @@ const ModifierSearch: React.FC<ModifierSearchProps> = ({ type, options, onSelect
               ${type === 'prefix' ? 'text-blue-300' : 'text-purple-300'}
             `}
           >
-            {text}
+            {mod.text}
           </button>
         ))}
       </div>
@@ -162,10 +169,10 @@ export const IdolConfigForm: React.FC<IdolConfigFormProps> = ({
   // Get available modifiers (excluding already selected ones)
   const availableModifiers = {
     prefixes: modifierData.prefixes.filter(
-      (mod) => !formData.modifiers.some((m) => m.type === 'prefix' && m.text === mod)
+      (mod) => !formData.modifiers.some((m) => m.type === 'prefix' && m.code === mod.code)
     ),
     suffixes: modifierData.suffixes.filter(
-      (mod) => !formData.modifiers.some((m) => m.type === 'suffix' && m.text === mod)
+      (mod) => !formData.modifiers.some((m) => m.type === 'suffix' && m.code === mod.code)
     ),
   };
 
@@ -218,16 +225,30 @@ export const IdolConfigForm: React.FC<IdolConfigFormProps> = ({
     const id = crypto.randomUUID();
     setFormData((prev) => ({
       ...prev,
-      modifiers: [...prev.modifiers, { id, type, text: '' }],
+      modifiers: [...prev.modifiers, { id, type, text: '', code: '' }],
     }));
     setActiveSearch({ type, id });
     setErrors((prev) => ({ ...prev, modifiers: undefined }));
   };
 
-  const handleModifierSelect = (id: string, text: string) => {
+  const handleModifierSelect = (id: string, selectedText: string) => {
     setFormData((prev) => ({
       ...prev,
-      modifiers: prev.modifiers.map((m) => (m.id === id ? { ...m, text } : m)),
+      modifiers: prev.modifiers.map((m) => {
+        if (m.id !== id) return m;
+
+        const modList =
+          m.type === 'prefix' ? availableModifiers.prefixes : availableModifiers.suffixes;
+        const selectedMod = modList.find((mod) => mod.text === selectedText);
+
+        if (!selectedMod) return m;
+
+        return {
+          ...m,
+          text: selectedMod.text,
+          code: selectedMod.code,
+        };
+      }),
     }));
   };
 
@@ -248,9 +269,8 @@ export const IdolConfigForm: React.FC<IdolConfigFormProps> = ({
       newErrors.name = 'Name is required';
     }
 
-    if (formData.modifiers.length === 0) {
-      newErrors.modifiers = 'At least one modifier is required';
-    } else if (formData.modifiers.some((m) => !m.text.trim())) {
+    // Only validate modifier text if there are any modifiers
+    if (formData.modifiers.length > 0 && formData.modifiers.some((m) => !m.text.trim())) {
       newErrors.modifiers = 'All modifiers must have text';
     }
 

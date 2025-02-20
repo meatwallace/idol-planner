@@ -16,7 +16,7 @@ export const ModifierList: React.FC<ModifierListProps> = ({ idols, className = '
       .filter((idol) => idol.position)
       .forEach((idol) => {
         idol.modifiers.forEach((modifier) => {
-          const key = `${modifier.type}-${modifier.text}`;
+          const key = `${modifier.type}-${modifier.code}`;
           const existing = modifierMap.get(key);
 
           if (existing) {
@@ -25,17 +25,18 @@ export const ModifierList: React.FC<ModifierListProps> = ({ idols, className = '
             modifierMap.set(key, {
               text: modifier.text,
               type: modifier.type,
+              code: modifier.code,
               count: 1,
             });
           }
         });
       });
 
-    // Convert map to array and sort by count (descending) and then by text
-    return Array.from(modifierMap.values()).sort((a, b) => {
-      if (b.count !== a.count) return b.count - a.count;
-      return a.text.localeCompare(b.text);
+    const sortedModifiers = Array.from(modifierMap.values()).sort((a, b) => {
+      return a.code.localeCompare(b.code);
     });
+
+    return sortedModifiers;
   }, [idols]);
 
   // Function to process modifier text and calculate totals
@@ -57,16 +58,18 @@ export const ModifierList: React.FC<ModifierListProps> = ({ idols, className = '
 
   return (
     <div className={`bg-stone-900 border border-stone-800 rounded-lg p-4 ${className}`}>
-      <h3 className='text-xs font-medium mb-3'>Active Modifiers</h3>
-      <div className='flex flex-col gap-2 max-w-md mx-auto'>
+      <h3 className='text-xs font-medium mb-3'>Atlas Modifiers</h3>
+      <p className='text-xs text-stone-400 mb-3'>
+        If these modifiers are calculated wrong - sorry 😊
+      </p>
+      <div className='flex flex-col gap-2 mx-auto'>
         {aggregatedModifiers.map((modifier) => {
           const displayText = processModifierText(modifier.text, modifier.count);
           return (
             <div
-              key={`${modifier.type}-${modifier.text}`}
+              key={`${modifier.type}-${modifier.code}`}
               className={`
-                text-xs rounded px-3 py-1.5
-                ${modifier.type === 'prefix' ? 'bg-blue-900/30' : 'bg-purple-900/30'}
+                text-xs rounded px-3 py-1.5 bg-slate-600/30
               `}
             >
               {displayText}

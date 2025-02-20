@@ -27,6 +27,7 @@ export type IdolModifier = {
   id: string;
   type: ModifierType;
   text: string;
+  code: string;
 };
 
 export type Idol = {
@@ -44,5 +45,6 @@ export type Idol = {
 export type AggregatedModifier = {
   text: string;
   type: ModifierType;
+  code: string;
   count: number;
 };
