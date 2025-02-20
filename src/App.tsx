@@ -148,27 +148,57 @@ function App() {
   const [grid, setGrid] = useState<Grid>(INITIAL_GRID);
   const [editingIdol, setEditingIdol] = useState<Idol | undefined>();
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [showShareNotification, setShowShareNotification] = useState(false);
 
-  const handleClearGrid = () => {
-    // Reset grid to initial state
-    setGrid(INITIAL_GRID);
-    // Remove all placed idols
-    setIdols((prev) => prev.filter((idol) => !idol.position));
-  };
-
-  const handleDeleteIdol = (id: string) => {
-    setIdols((prev) => prev.filter((idol) => idol.id !== id));
-    setDeleteConfirmId(null);
-  };
-
-  // Load initial state from URL
+  // Load initial state from URL or localStorage
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const encodedIdols = params.get('idols');
+
     if (encodedIdols) {
-      setIdols(decodeIdols(encodedIdols));
+      // If URL has state, use it and update localStorage
+      const decodedIdols = decodeIdols(encodedIdols);
+      setIdols(decodedIdols);
+      localStorage.setItem(
+        'idolPlanner',
+        JSON.stringify({
+          idols: decodedIdols,
+          grid: INITIAL_GRID,
+        })
+      );
+    } else {
+      // If no URL state, try to load from localStorage
+      const savedState = localStorage.getItem('idolPlanner');
+      if (savedState) {
+        try {
+          const { idols: savedIdols, grid: savedGrid } = JSON.parse(savedState);
+          setIdols(savedIdols);
+          setGrid(savedGrid);
+
+          // Update URL with loaded state
+          if (savedIdols.length > 0) {
+            const newUrl = new URL(window.location.href);
+            newUrl.searchParams.set('idols', encodeIdols(savedIdols));
+            window.history.replaceState({}, '', newUrl);
+          }
+        } catch (e) {
+          console.error('Failed to load state from localStorage:', e);
+        }
+      }
     }
   }, []);
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem(
+      'idolPlanner',
+      JSON.stringify({
+        idols,
+        grid,
+      })
+    );
+  }, [idols, grid]);
 
   // Update URL when state changes
   useEffect(() => {
@@ -179,8 +209,24 @@ function App() {
     } else {
       // Clear URL params if no idols exist
       window.history.replaceState({}, '', window.location.pathname);
+      // Also clear localStorage
+      localStorage.removeItem('idolPlanner');
     }
   }, [idols]);
+
+  const handleClearGrid = () => {
+    // Reset grid to initial state
+    setGrid(INITIAL_GRID);
+    // Remove all placed idols
+    setIdols((prev) => prev.filter((idol) => !idol.position));
+    // Reset confirmation state
+    setShowClearConfirm(false);
+  };
+
+  const handleDeleteIdol = (id: string) => {
+    setIdols((prev) => prev.filter((idol) => idol.id !== id));
+    setDeleteConfirmId(null);
+  };
 
   const handleCellClick = (cell: GridCell) => {
     if (!cell.isActive) return;
@@ -301,9 +347,33 @@ function App() {
   // Get the list of placed idols (those with a position)
   const placedIdols = idols.filter((idol) => idol.position);
 
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href).then(
+      () => {
+        setShowShareNotification(true);
+        setTimeout(() => setShowShareNotification(false), 2000);
+      },
+      (err) => {
+        console.error('Failed to copy URL:', err);
+      }
+    );
+  };
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div className='relative min-h-screen bg-stone-950 text-white'>
+        {/* Share notification */}
+        <div
+          className={`
+            fixed top-4 left-1/2 -translate-x-1/2 z-50
+            bg-stone-800 text-stone-200 px-4 py-2 rounded-lg shadow-lg
+            transition-all duration-300 ease-in-out
+            ${showShareNotification ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}
+          `}
+        >
+          URL copied to clipboard
+        </div>
+
         {/* Drag Preview Layer */}
         <DragPreviewLayer />
 
@@ -338,12 +408,23 @@ function App() {
                     onIdolDrop={handleIdolDrop}
                     placedIdols={placedIdols}
                   />
-                  <button
-                    onClick={handleClearGrid}
-                    className='absolute -bottom-8 right-0 px-3 py-1.5 my-1 text-xs bg-red-900/30 hover:bg-red-800/40 rounded text-red-300'
-                  >
-                    Clear Grid
-                  </button>
+                  <div className='absolute -bottom-8 right-0 flex gap-2'>
+                    <button
+                      onClick={handleShare}
+                      className='px-3 py-1.5 text-xs bg-blue-900/30 hover:bg-blue-800/40 rounded text-blue-300'
+                    >
+                      Share
+                    </button>
+                    <button
+                      onClick={() =>
+                        showClearConfirm ? handleClearGrid() : setShowClearConfirm(true)
+                      }
+                      onBlur={() => setTimeout(() => setShowClearConfirm(false), 200)}
+                      className='px-3 py-1.5 text-xs bg-red-900/30 hover:bg-red-800/40 rounded text-red-300'
+                    >
+                      {showClearConfirm ? 'Click to confirm' : 'Clear Grid'}
+                    </button>
+                  </div>
                 </div>
 
                 {/* Modifier List */}
