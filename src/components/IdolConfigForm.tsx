@@ -280,6 +280,13 @@ export const IdolConfigForm: React.FC<IdolConfigFormProps> = ({
       newErrors.name = 'Name is required';
     }
 
+    // Validate that there is at least one prefix or suffix
+    const hasPrefix = formData.modifiers.some((m) => m.type === 'prefix' && m.text.trim());
+    const hasSuffix = formData.modifiers.some((m) => m.type === 'suffix' && m.text.trim());
+    if (!hasPrefix && !hasSuffix) {
+      newErrors.modifiers = 'At least one prefix or suffix is required';
+    }
+
     // Only validate modifier text if there are any modifiers
     if (formData.modifiers.length > 0 && formData.modifiers.some((m) => !m.text.trim())) {
       newErrors.modifiers = 'All modifiers must have text';
