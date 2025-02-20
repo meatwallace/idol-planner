@@ -5,5 +5,6 @@ globs: *
 Respect these rules while implementing code:
 
 * Use Yarn v2 PnP for package management
-* Prefer working out of the single [App.tsx](mdc:src/App.tsx) file to maintain context
+* Repo scripts can be found in [package.json](mdc:package.json)
+* Types should be stored in [types.ts](mdc:src/types.ts)
 * Use tailwind for styles
