@@ -15,9 +15,12 @@ interface IdolFormData {
 }
 
 const AVAILABLE_SIZES: IdolSize[] = [
-  { width: 1, height: 1 },
-  { width: 2, height: 2 },
-  { width: 1, height: 3 },
+  { width: 1, height: 1 }, // AtlasRelic1x1
+  { width: 1, height: 2 }, // AtlasRelic1x2
+  { width: 1, height: 3 }, // AtlasRelic1x3
+  { width: 2, height: 1 }, // AtlasRelic2x1
+  { width: 2, height: 2 }, // AtlasRelic2x2
+  { width: 3, height: 1 }, // AtlasRelic3x1
 ];
 
 export const IdolConfigForm: React.FC<IdolConfigFormProps> = ({
@@ -97,64 +100,48 @@ export const IdolConfigForm: React.FC<IdolConfigFormProps> = ({
 
             {/* Form */}
             <form className='space-y-3' onSubmit={handleSubmit}>
-              <div className='flex gap-3'>
-                {/* Left Column */}
-                <div className='flex-1 space-y-3'>
-                  {/* Name Input */}
-                  <div className='space-y-1'>
-                    <label htmlFor='idolName' className='block text-sm font-medium'>
-                      Name
-                    </label>
-                    <input
-                      ref={nameInputRef}
-                      type='text'
-                      id='idolName'
-                      value={formData.name}
-                      onChange={handleNameChange}
+              {/* Name Input */}
+              <div className='space-y-1'>
+                <label htmlFor='idolName' className='block text-sm font-medium'>
+                  Name
+                </label>
+                <input
+                  ref={nameInputRef}
+                  type='text'
+                  id='idolName'
+                  value={formData.name}
+                  onChange={handleNameChange}
+                  className={`
+                    w-full bg-stone-800 border rounded px-2 py-1.5 text-sm
+                    focus:outline-none focus:border-amber-600
+                    ${errors.name ? 'border-red-500' : 'border-stone-700'}
+                  `}
+                  placeholder='Enter idol name...'
+                />
+                {errors.name && <p className='text-red-500 text-xs mt-1'>{errors.name}</p>}
+              </div>
+
+              {/* Size Selection */}
+              <div className='space-y-1'>
+                <label className='block text-sm font-medium'>Size</label>
+                <div className='grid grid-cols-3 gap-1.5'>
+                  {AVAILABLE_SIZES.map((size) => (
+                    <button
+                      key={`${size.width}x${size.height}`}
+                      type='button'
+                      onClick={() => handleSizeSelect(size)}
                       className={`
-                        w-full bg-stone-800 border rounded px-2 py-1.5 text-sm
-                        focus:outline-none focus:border-amber-600
-                        ${errors.name ? 'border-red-500' : 'border-stone-700'}
+                        border rounded px-2 py-1.5 text-sm
+                        ${
+                          formData.size.width === size.width && formData.size.height === size.height
+                            ? 'bg-amber-700/30 border-amber-600'
+                            : 'bg-stone-800 border-stone-700 hover:bg-stone-700'
+                        }
                       `}
-                      placeholder='Enter idol name...'
-                    />
-                    {errors.name && <p className='text-red-500 text-xs mt-1'>{errors.name}</p>}
-                  </div>
-
-                  {/* Size Selection */}
-                  <div className='space-y-1'>
-                    <label className='block text-sm font-medium'>Size</label>
-                    <div className='grid grid-cols-3 gap-1.5'>
-                      {AVAILABLE_SIZES.map((size) => (
-                        <button
-                          key={`${size.width}x${size.height}`}
-                          type='button'
-                          onClick={() => handleSizeSelect(size)}
-                          className={`
-                            border rounded px-2 py-1.5 text-sm
-                            ${
-                              formData.size.width === size.width &&
-                              formData.size.height === size.height
-                                ? 'bg-amber-700/30 border-amber-600'
-                                : 'bg-stone-800 border-stone-700 hover:bg-stone-700'
-                            }
-                          `}
-                        >
-                          {size.width}x{size.height}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right Column - Preview */}
-                <div className='w-48'>
-                  <label className='block text-sm font-medium mb-1'>Preview</label>
-                  <div className='h-24 bg-stone-800 rounded flex items-center justify-center border border-stone-700'>
-                    <span className='text-stone-500 text-sm'>
-                      {formData.size.width}x{formData.size.height}
-                    </span>
-                  </div>
+                    >
+                      {size.width}x{size.height}
+                    </button>
+                  ))}
                 </div>
               </div>
 

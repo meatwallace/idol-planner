@@ -155,17 +155,20 @@ The Idol system in Path of Exile allows players to socket special items called "
 ### Phase 4: Drag and Drop
 
 - [ ] Basic DnD Implementation
-  - [ ] Drag source setup (inventory items)
-  - [ ] Drop target setup (grid)
-  - [ ] Drag preview
+  - [x] Drag source setup (inventory items)
+  - [x] Drop target setup (grid)
+  - [ ] Cursor-attached preview
+  - [ ] Auto-collapse inventory during drag
+  - [ ] Fade out overlay during drag
 - [ ] Placement Validation
   - [ ] Check for active cells
   - [ ] Check for grid boundaries
   - [ ] Check for overlapping
+  - [ ] Check all required cells for idol size
   - [ ] Visual feedback during drag
 - [ ] Instance Management
   - [ ] Create instance from template
-  - [ ] Update grid state
+  - [ ] Update grid state for all occupied cells
   - [ ] Remove instance
   - [ ] Return to inventory
 
