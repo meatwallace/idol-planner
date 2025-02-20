@@ -323,7 +323,7 @@ export const IdolGrid: React.FC<GridProps> = ({
   };
 
   return (
-    <div className='relative border-2 border-stone-800 rounded-lg p-1 bg-stone-900'>
+    <div className='relative border-2 border-stone-800 rounded-lg p-1 my-1 bg-stone-900'>
       <div
         ref={gridRef}
         className='grid gap-0.5 relative'

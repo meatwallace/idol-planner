@@ -340,7 +340,7 @@ function App() {
                   />
                   <button
                     onClick={handleClearGrid}
-                    className='absolute -bottom-8 right-0 px-3 py-1.5 text-xs bg-red-900/30 hover:bg-red-800/40 rounded text-red-300'
+                    className='absolute -bottom-8 right-0 px-3 py-1.5 my-1 text-xs bg-red-900/30 hover:bg-red-800/40 rounded text-red-300'
                   >
                     Clear Grid
                   </button>
