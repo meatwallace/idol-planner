@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight, Plus } from 'react-feather';
 import { Idol, IdolSize } from '../types';
 import { DraggableIdol } from './DraggableIdol';
 
-// Import all atlas relic images for the section headers
+// Import all idol images for the section headers
 import atlasRelic1x1 from '../images/AtlasRelic1x1.webp';
 import atlasRelic1x2 from '../images/AtlasRelic1x2.webp';
 import atlasRelic1x3 from '../images/AtlasRelic1x3.webp';
@@ -22,12 +22,12 @@ interface IdolInventoryProps {
 
 // Map of size dimensions to image paths and display names
 const IDOL_SECTIONS = [
-  { size: { width: 1, height: 1 }, image: atlasRelic1x1, name: 'Small Atlas Relic' },
-  { size: { width: 1, height: 2 }, image: atlasRelic1x2, name: 'Tall Atlas Relic' },
-  { size: { width: 1, height: 3 }, image: atlasRelic1x3, name: 'Grand Atlas Relic' },
-  { size: { width: 2, height: 1 }, image: atlasRelic2x1, name: 'Wide Atlas Relic' },
-  { size: { width: 2, height: 2 }, image: atlasRelic2x2, name: 'Large Atlas Relic' },
-  { size: { width: 3, height: 1 }, image: atlasRelic3x1, name: 'Greater Atlas Relic' },
+  { size: { width: 1, height: 1 }, image: atlasRelic1x1, name: 'Minor Idol' },
+  { size: { width: 1, height: 2 }, image: atlasRelic1x2, name: 'Kamasan Idol' },
+  { size: { width: 1, height: 3 }, image: atlasRelic1x3, name: 'Totemic Idol' },
+  { size: { width: 2, height: 1 }, image: atlasRelic2x1, name: 'Noble Idol' },
+  { size: { width: 2, height: 2 }, image: atlasRelic2x2, name: 'Conqueror Idol' },
+  { size: { width: 3, height: 1 }, image: atlasRelic3x1, name: 'Burial Idol' },
 ] as const;
 
 interface SectionHeaderProps {

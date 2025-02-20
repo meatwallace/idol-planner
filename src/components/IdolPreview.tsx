@@ -1,7 +1,7 @@
 import React from 'react';
 import { Idol } from '../types';
 
-// Import all atlas relic images
+// Import all idol images
 import atlasRelic1x1 from '../images/AtlasRelic1x1.webp';
 import atlasRelic1x2 from '../images/AtlasRelic1x2.webp';
 import atlasRelic1x3 from '../images/AtlasRelic1x3.webp';
@@ -55,7 +55,7 @@ export const IdolPreview: React.FC<IdolPreviewProps> = ({ idol, className = '' }
     >
       <img
         src={imagePath}
-        alt={`${idol.size.width}x${idol.size.height} Atlas Relic`}
+        alt={`${idol.size.width}x${idol.size.height} Idol`}
         className={`
           w-full h-full object-cover
           ${isPlaced ? 'opacity-100' : 'opacity-30'}
