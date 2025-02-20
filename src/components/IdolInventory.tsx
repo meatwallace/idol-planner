@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Plus } from 'react-feather';
 import { Idol, IdolSize } from '../types';
 import { DraggableIdol } from './DraggableIdol';
@@ -18,6 +18,7 @@ interface IdolInventoryProps {
   onToggleCollapse: () => void;
   onDragStart: () => void;
   onDragEnd: () => void;
+  onDeleteIdol?: (id: string) => void;
 }
 
 // Map of size dimensions to image paths and display names
@@ -53,7 +54,10 @@ export const IdolInventory: React.FC<IdolInventoryProps> = ({
   onToggleCollapse,
   onDragStart,
   onDragEnd,
+  onDeleteIdol,
 }) => {
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+
   const handleDragStateChange = (isDragging: boolean) => {
     if (isDragging) {
       onDragStart();
@@ -139,6 +143,9 @@ export const IdolInventory: React.FC<IdolInventoryProps> = ({
                             key={idol.id}
                             idol={idol}
                             onDragStateChange={handleDragStateChange}
+                            onDeleteClick={(id) => setDeleteConfirmId(id)}
+                            showDeleteConfirm={deleteConfirmId === idol.id}
+                            onConfirmDelete={onDeleteIdol}
                           />
                         ))}
                       </div>

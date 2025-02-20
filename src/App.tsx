@@ -146,12 +146,18 @@ function App() {
   const [isConfigFormOpen, setIsConfigFormOpen] = useState(false);
   const [idols, setIdols] = useState<Idol[]>([]);
   const [grid, setGrid] = useState<Grid>(INITIAL_GRID);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   const handleClearGrid = () => {
     // Reset grid to initial state
     setGrid(INITIAL_GRID);
     // Remove all placed idols
     setIdols((prev) => prev.filter((idol) => !idol.position));
+  };
+
+  const handleDeleteIdol = (id: string) => {
+    setIdols((prev) => prev.filter((idol) => idol.id !== id));
+    setDeleteConfirmId(null);
   };
 
   // Load initial state from URL
@@ -331,6 +337,7 @@ function App() {
                 onToggleCollapse={() => setIsInventoryCollapsed(!isInventoryCollapsed)}
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
+                onDeleteIdol={handleDeleteIdol}
               />
             </div>
           </main>
