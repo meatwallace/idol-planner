@@ -2,13 +2,31 @@ import { IdolGrid } from './components/Grid';
 import { IdolInventory } from './components/IdolInventory';
 import { IdolConfigForm } from './components/IdolConfigForm';
 import { DragPreviewLayer } from './components/DragPreviewLayer';
-import { GridCell, Idol, Grid, ModifierType } from './types';
+import { GridCell, Idol, Grid, ModifierType, IdolSize } from './types';
 import { useState, useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { ModifierList } from './components/ModifierList';
 import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
 import { createId } from '@paralleldrive/cuid2';
+
+// Import all idol modifier data
+import minorIdolMods from './data/minor_idol_mods.json';
+import kamasanIdolMods from './data/kamasan_idol_mods.json';
+import totemicIdolMods from './data/totemic_idol_mods.json';
+import nobleIdolMods from './data/noble_idol_mods.json';
+import conquerorIdolMods from './data/conqueror_idol_mods.json';
+import burialIdolMods from './data/burial_idol_mods.json';
+
+// Map of size dimensions to modifier data
+const IDOL_MODS = {
+  '1x1': minorIdolMods,
+  '1x2': kamasanIdolMods,
+  '1x3': totemicIdolMods,
+  '2x1': nobleIdolMods,
+  '2x2': conquerorIdolMods,
+  '3x1': burialIdolMods,
+} as const;
 
 // Drag and drop type constants
 export const DragTypes = {
@@ -107,32 +125,53 @@ const decodeIdols = (encoded: string): Idol[] => {
 
     const decoded = JSON.parse(decompressed);
 
+    // Helper function to get modifier text from code
+    const getModifierText = (code: string, size: IdolSize, type: 'prefix' | 'suffix'): string => {
+      const sizeKey = `${size.width}x${size.height}`;
+      const mods = IDOL_MODS[sizeKey as keyof typeof IDOL_MODS];
+      const list = type === 'prefix' ? mods?.prefixes : mods?.suffixes;
+      const mod = list?.find((m: any) => m.Code === code);
+      return mod?.Mod || '';
+    };
+
     // Decode placed idols
-    const placedIdols = (decoded.p || []).map((d: any) => ({
-      id: createId(),
-      name: d[0],
-      size: { width: d[1][0], height: d[1][1] },
-      position: { x: d[2][0], y: d[2][1] },
-      modifiers: d[3].map((m: any) => ({
+    const placedIdols = (decoded.p || []).map((d: any) => {
+      const size = { width: d[1][0], height: d[1][1] };
+      return {
         id: createId(),
-        type: m[0] === 0 ? 'prefix' : 'suffix',
-        text: '', // We'll need to look this up from the modifier data
-        code: m[1],
-      })),
-    }));
+        name: d[0],
+        size,
+        position: { x: d[2][0], y: d[2][1] },
+        modifiers: d[3].map((m: any) => {
+          const type = m[0] === 0 ? 'prefix' : 'suffix';
+          return {
+            id: createId(),
+            type,
+            code: m[1],
+            text: getModifierText(m[1], size, type),
+          };
+        }),
+      };
+    });
 
     // Decode inventory idols
-    const inventoryIdols = (decoded.i || []).map((d: any) => ({
-      id: createId(),
-      name: d[0],
-      size: { width: d[1][0], height: d[1][1] },
-      modifiers: d[2].map((m: any) => ({
+    const inventoryIdols = (decoded.i || []).map((d: any) => {
+      const size = { width: d[1][0], height: d[1][1] };
+      return {
         id: createId(),
-        type: m[0] === 0 ? 'prefix' : 'suffix',
-        text: '', // We'll need to look this up from the modifier data
-        code: m[1],
-      })),
-    }));
+        name: d[0],
+        size,
+        modifiers: d[2].map((m: any) => {
+          const type = m[0] === 0 ? 'prefix' : 'suffix';
+          return {
+            id: createId(),
+            type,
+            code: m[1],
+            text: getModifierText(m[1], size, type),
+          };
+        }),
+      };
+    });
 
     return [...placedIdols, ...inventoryIdols];
   } catch (e) {
@@ -398,6 +437,9 @@ function App() {
               <a href='https://github.com/meatwallace/idol-planner'>
                 https://github.com/meatwallace/idol-planner
               </a>
+            </p>
+            <p className='text-s text-stone-400 font-bold'>
+              !!! save your URLs before opening someone elses link !!!
             </p>
           </header>
 

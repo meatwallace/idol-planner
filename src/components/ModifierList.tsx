@@ -42,13 +42,23 @@ export const ModifierList: React.FC<ModifierListProps> = ({ idols, className = '
   // Function to process modifier text and calculate totals
   const processModifierText = (text: string, count: number): string => {
     // Match patterns like "+25%" or "-10%"
-    const percentageMatch = text.match(/([+-])(\d+)%/);
-    if (percentageMatch) {
-      const [fullMatch, sign, number] = percentageMatch;
+    const signedMatch = text.match(/([+-])(\d+)%/);
+    if (signedMatch) {
+      const [fullMatch, sign, number] = signedMatch;
       const totalValue = parseInt(number) * count;
       // Replace the percentage in the text with the calculated total
       return text.replace(fullMatch, `${sign}${totalValue}%`);
     }
+
+    // Match patterns like "100%" (without sign)
+    const unsignedMatch = text.match(/(\d+)%/);
+    if (unsignedMatch) {
+      const [fullMatch, number] = unsignedMatch;
+      const totalValue = parseInt(number) * count;
+      // Replace the percentage in the text with the calculated total
+      return text.replace(fullMatch, `${totalValue}%`);
+    }
+
     return text;
   };
 
