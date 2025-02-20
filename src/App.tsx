@@ -99,6 +99,13 @@ function App() {
   };
 
   const handleIdolDrop = (idol: Idol, cell: GridCell) => {
+    // Handle deletion case
+    if (cell.x === -1 && cell.y === -1) {
+      // Remove the idol from the list
+      setIdols((prev) => prev.filter((i) => i.id !== idol.id));
+      return;
+    }
+
     // Validate placement
     if (!canPlaceIdol(grid, idol, cell)) return;
 

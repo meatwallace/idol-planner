@@ -131,7 +131,7 @@ The Idol system in Path of Exile allows players to socket special items called "
   - [x] Proper z-index layering
   - [x] Smooth opacity transitions
 
-### Phase 3: Idol Configuration (Next)
+### Phase 3: Idol Configuration ✅
 
 - [x] Configuration Panel UI
   - [x] Basic form layout
@@ -144,35 +144,29 @@ The Idol system in Path of Exile allows players to socket special items called "
   - [x] Create new template
   - [x] Template validation
   - [x] Save template to inventory
-  - [ ] Edit existing template
-  - [ ] Delete template confirmation
-- [ ] Modifier System
-  - [ ] Prefix/suffix selector
-  - [ ] Modifier input fields
-  - [ ] Modifier validation
-  - [ ] Preview in template card
+  - [x] Edit existing template
+  - [x] Delete template confirmation
 
-### Phase 4: Drag and Drop
+### Phase 4: Drag and Drop ✅
 
-- [ ] Basic DnD Implementation
+- [x] Basic DnD Implementation
   - [x] Drag source setup (inventory items)
   - [x] Drop target setup (grid)
-  - [ ] Cursor-attached preview
-  - [ ] Auto-collapse inventory during drag
-  - [ ] Fade out overlay during drag
-- [ ] Placement Validation
-  - [ ] Check for active cells
-  - [ ] Check for grid boundaries
-  - [ ] Check for overlapping
-  - [ ] Check all required cells for idol size
-  - [ ] Visual feedback during drag
-- [ ] Instance Management
-  - [ ] Create instance from template
-  - [ ] Update grid state for all occupied cells
-  - [ ] Remove instance
-  - [ ] Return to inventory
+  - [x] Cursor-attached preview
+  - [x] Auto-collapse inventory during drag
+  - [x] Fade out overlay during drag
+- [x] Placement Validation
+  - [x] Check for active cells
+  - [x] Check for grid boundaries
+  - [x] Check for overlapping
+  - [x] Check all required cells for idol size
+  - [x] Visual feedback during drag
+- [x] Instance Management
+  - [x] Create instance from template
+  - [x] Update grid state for all occupied cells
+  - [x] Remove instance
 
-### Phase 5: Modifier System
+### Phase 5: Modifier System (Next)
 
 - [ ] Modifier UI
   - [ ] Prefix/suffix selector
@@ -184,25 +178,24 @@ The Idol system in Path of Exile allows players to socket special items called "
   - [ ] Validate modifier constraints
   - [ ] Update template/instance
 
-### Phase 6: Grid Interactions
+### Phase 6: Grid Interactions (In Progress)
 
-- [ ] Placed Idol Management
-  - [ ] Highlight placed idols
-  - [ ] Show idol details on hover
-  - [ ] Remove idol from grid
-  - [ ] Rotate idol (if applicable)
-- [ ] Grid State Management
-  - [ ] Track occupied cells
-  - [ ] Update cell states
-  - [ ] Validate placement rules
+- [x] Placed Idol Management
+  - [x] Highlight placed idols
+  - [x] Show idol details on hover
+  - [x] Remove idol from grid
+- [x] Grid State Management
+  - [x] Track occupied cells
+  - [x] Update cell states
+  - [x] Validate placement rules
 
 ### Phase 7: Polish & UX
 
-- [ ] Visual Feedback
-  - [ ] Loading states
-  - [ ] Error states
-  - [ ] Success notifications
-  - [ ] Drag preview styling
+- [x] Visual Feedback
+  - [x] Loading states
+  - [x] Error states
+  - [x] Success notifications
+  - [x] Drag preview styling
 - [ ] Responsive Design
   - [ ] Mobile layout
   - [ ] Touch interactions
@@ -225,8 +218,9 @@ The Idol system in Path of Exile allows players to socket special items called "
 
 ## Current Focus
 
-Moving from Phase 3 (Idol Configuration) to Phase 4 (Drag and Drop). Next steps:
+Moving from Phase 6 (Grid Interactions) to Phase 5 (Modifier System). Next steps:
 
-1. Implement drag and drop functionality for idols
-2. Add placement validation
-3. Handle idol placement on the grid
+1. Design and implement the modifier UI components
+2. Add modifier validation logic
+3. Update idol templates to support modifiers
+4. Integrate modifier display in the inventory and grid

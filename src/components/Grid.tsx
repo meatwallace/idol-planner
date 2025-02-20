@@ -3,6 +3,7 @@ import { useDrop, useDrag } from 'react-dnd';
 import { Grid, GridCell, Idol } from '../types';
 import { DragTypes } from '../App';
 import { IdolPreview } from './IdolPreview';
+import { Trash2 } from 'react-feather';
 
 // Initial grid configuration based on the image
 // 6x7 grid with specific inactive cells
@@ -41,6 +42,10 @@ INACTIVE_CELLS.forEach(([x, y]) => {
     INITIAL_GRID.cells[y][x].isActive = false;
   }
 });
+
+interface DragItem extends Idol {
+  source: 'grid' | 'inventory';
+}
 
 interface GridProps {
   grid?: Grid;
@@ -129,10 +134,10 @@ const GridCellComponent: React.FC<GridCellProps> = ({
     cell.x === placedIdol.position.x &&
     cell.y === placedIdol.position.y;
 
-  const [{ isDragging }, drag] = useDrag<Idol, unknown, { isDragging: boolean }>(
+  const [{ isDragging }, drag] = useDrag<DragItem, unknown, { isDragging: boolean }>(
     () => ({
       type: DragTypes.IDOL,
-      item: placedIdol,
+      item: () => ({ ...placedIdol!, source: 'grid' }),
       canDrag: () => Boolean(placedIdol && isPartOfIdol),
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
@@ -182,6 +187,49 @@ const GridCellComponent: React.FC<GridCellProps> = ({
   );
 };
 
+interface DeleteZoneProps {
+  onDelete: (idol: Idol) => void;
+}
+
+const DeleteZone: React.FC<DeleteZoneProps> = ({ onDelete }) => {
+  const deleteRef = useRef<HTMLDivElement>(null);
+  const [{ isOver, isDraggingFromGrid }, drop] = useDrop<
+    DragItem,
+    void,
+    { isOver: boolean; isDraggingFromGrid: boolean }
+  >(
+    () => ({
+      accept: DragTypes.IDOL,
+      canDrop: (item) => item.source === 'grid',
+      drop: (item) => onDelete(item),
+      collect: (monitor) => ({
+        isOver: monitor.isOver(),
+        isDraggingFromGrid: monitor.getItem()?.source === 'grid',
+      }),
+    }),
+    [onDelete]
+  );
+
+  // Apply the drop ref
+  drop(deleteRef);
+
+  return (
+    <div
+      ref={deleteRef}
+      className={`
+        absolute bottom-1 right-1 w-10 h-10
+        flex items-center justify-center
+        transition-all duration-300 ease-in-out
+        text-stone-500
+        ${isDraggingFromGrid ? 'opacity-100 scale-110 hover:opacity-100' : 'opacity-30 scale-100'}
+        ${isOver ? 'text-red-500' : ''}
+      `}
+    >
+      <Trash2 size={18} />
+    </div>
+  );
+};
+
 export const IdolGrid: React.FC<GridProps> = ({
   grid = INITIAL_GRID,
   onCellClick,
@@ -190,9 +238,9 @@ export const IdolGrid: React.FC<GridProps> = ({
 }) => {
   const gridRef = useRef<HTMLDivElement>(null);
   const [hoverCell, setHoverCell] = useState<GridCell | null>(null);
-  const [dragItem, setDragItem] = useState<Idol | null>(null);
+  const [dragItem, setDragItem] = useState<DragItem | null>(null);
 
-  const [{ isOver }, drop] = useDrop<Idol, void, { isOver: boolean }>(
+  const [{ isOver }, drop] = useDrop<DragItem, void, { isOver: boolean }>(
     () => ({
       accept: DragTypes.IDOL,
       hover: (item, monitor) => {
@@ -255,6 +303,30 @@ export const IdolGrid: React.FC<GridProps> = ({
     }
   }, [isOver, hoverCell, dragItem]);
 
+  const handleDelete = (idol: Idol) => {
+    // Create a new grid state
+    const newGrid = { ...grid };
+
+    // Clear the cells occupied by the idol
+    if (idol.position) {
+      for (let dy = 0; dy < idol.size.height; dy++) {
+        for (let dx = 0; dx < idol.size.width; dx++) {
+          const y = idol.position.y + dy;
+          const x = idol.position.x + dx;
+          if (newGrid.cells[y] && newGrid.cells[y][x]) {
+            newGrid.cells[y][x].isOccupied = false;
+          }
+        }
+      }
+    }
+
+    // Call onIdolDrop with a removal indicator
+    onIdolDrop?.(
+      { ...idol, position: undefined }, // Clear the position to remove it from the grid
+      { x: -1, y: -1, isActive: false, isOccupied: false } // Use invalid coordinates to indicate removal
+    );
+  };
+
   return (
     <div className='relative border-2 border-stone-800 rounded-lg p-1 bg-stone-900'>
       <div
@@ -308,6 +380,9 @@ export const IdolGrid: React.FC<GridProps> = ({
           })
         )}
       </div>
+
+      {/* Delete Zone */}
+      <DeleteZone onDelete={handleDelete} />
 
       {/* Decorative corners */}
       <div className='absolute -top-1 -left-1 w-4 h-4 border-t-2 border-l-2 border-amber-700/60 rounded-tl-lg' />
