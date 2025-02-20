@@ -44,18 +44,18 @@ export const ModifierList: React.FC<ModifierListProps> = ({ idols, className = '
 
   return (
     <div className={`bg-stone-900 border border-stone-800 rounded-lg p-4 ${className}`}>
-      <h3 className='text-sm font-medium mb-2'>Active Modifiers</h3>
-      <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2'>
+      <h3 className='text-sm font-medium mb-3'>Active Modifiers</h3>
+      <div className='flex flex-col gap-2 max-w-md mx-auto'>
         {aggregatedModifiers.map((modifier) => (
           <div
             key={`${modifier.type}-${modifier.text}`}
             className={`
-              text-sm rounded px-2 py-1.5 flex items-center justify-between
+              text-sm rounded px-3 py-2 flex items-center justify-between
               ${modifier.type === 'prefix' ? 'bg-blue-900/30' : 'bg-purple-900/30'}
             `}
           >
-            <span className='truncate'>{modifier.text}</span>
-            <span className='ml-2 text-xs opacity-70'>{modifier.count}×</span>
+            <span>{modifier.text}</span>
+            <span className='ml-3 text-sm opacity-70'>{modifier.count}×</span>
           </div>
         ))}
       </div>

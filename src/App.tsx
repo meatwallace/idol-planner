@@ -165,7 +165,7 @@ function App() {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className='relative min-h-screen bg-stone-950 text-white'>
+      <div className='min-h-screen bg-stone-950 text-white'>
         {/* Drag Preview Layer */}
         <DragPreviewLayer />
 
@@ -179,7 +179,7 @@ function App() {
           `}
         />
 
-        <div className='h-screen flex flex-col'>
+        <div className='min-h-screen flex flex-col'>
           {/* Header */}
           <header className='p-8'>
             <h1 className='text-3xl font-bold'>Idol Planner</h1>

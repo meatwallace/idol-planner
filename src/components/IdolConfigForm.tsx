@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { X, Plus, Trash2, Search } from 'react-feather';
 import { IdolSize, IdolModifier, ModifierType } from '../types';
 import { useModifierData } from '../hooks/useModifierData';
@@ -54,6 +54,7 @@ interface ModifierSearchProps {
 const ModifierSearch: React.FC<ModifierSearchProps> = ({ type, options, onSelect, onClose }) => {
   const [search, setSearch] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const fuse = useRef(
     new Fuse(options, {
       includeScore: true,
@@ -75,7 +76,19 @@ const ModifierSearch: React.FC<ModifierSearchProps> = ({ type, options, onSelect
       ignoreLocation: true,
       useExtendedSearch: true,
     });
-  }, [options]);
+
+    // Handle clicks outside of the search box
+    const handleClickOutside = (event: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [options, onClose]);
 
   const results = search
     ? fuse.current
@@ -85,7 +98,10 @@ const ModifierSearch: React.FC<ModifierSearchProps> = ({ type, options, onSelect
     : options.slice(0, 10);
 
   return (
-    <div className='absolute inset-x-0 top-0 bg-stone-900 border border-stone-700 rounded-lg shadow-xl z-10'>
+    <div
+      ref={containerRef}
+      className='absolute inset-x-0 top-0 bg-stone-900 border border-stone-700 rounded-lg shadow-xl z-10'
+    >
       <div className='p-2 border-b border-stone-800'>
         <div className='relative'>
           <Search size={14} className='absolute left-2 top-1/2 -translate-y-1/2 text-stone-400' />
@@ -250,6 +266,14 @@ export const IdolConfigForm: React.FC<IdolConfigFormProps> = ({
     );
   };
 
+  // Sort modifiers by type (prefixes first, then suffixes)
+  const sortedModifiers = useMemo(() => {
+    return [...formData.modifiers].sort((a, b) => {
+      if (a.type === b.type) return 0;
+      return a.type === 'prefix' ? -1 : 1;
+    });
+  }, [formData.modifiers]);
+
   if (!isOpen) return null;
 
   return (
@@ -359,7 +383,7 @@ export const IdolConfigForm: React.FC<IdolConfigFormProps> = ({
                 {errors.modifiers && <p className='text-red-500 text-xs'>{errors.modifiers}</p>}
 
                 <div className='space-y-1.5'>
-                  {formData.modifiers.map((modifier) => (
+                  {sortedModifiers.map((modifier) => (
                     <div key={modifier.id} className='relative'>
                       <div
                         className={`
