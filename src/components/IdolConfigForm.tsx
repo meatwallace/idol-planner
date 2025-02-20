@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { X, Plus, Trash2, Search } from 'react-feather';
 import { IdolSize, IdolModifier, ModifierType } from '../types';
 import { useModifierData } from '../hooks/useModifierData';
+import { createId } from '@paralleldrive/cuid2';
 import Fuse from 'fuse.js';
 
 // Import all idol images
@@ -222,7 +223,7 @@ export const IdolConfigForm: React.FC<IdolConfigFormProps> = ({
       }
     }
 
-    const id = crypto.randomUUID();
+    const id = createId();
     setFormData((prev) => ({
       ...prev,
       modifiers: [...prev.modifiers, { id, type, text: '', code: '' }],

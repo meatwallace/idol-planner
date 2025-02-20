@@ -3,10 +3,12 @@ import { IdolInventory } from './components/IdolInventory';
 import { IdolConfigForm } from './components/IdolConfigForm';
 import { DragPreviewLayer } from './components/DragPreviewLayer';
 import { GridCell, Idol, Grid, IdolModifier, ModifierType } from './types';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { ModifierList } from './components/ModifierList';
+import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
+import { createId } from '@paralleldrive/cuid2';
 
 // Drag and drop type constants
 export const DragTypes = {
@@ -73,11 +75,98 @@ const canPlaceIdol = (grid: Grid, idol: Idol, cell: GridCell): boolean => {
   return true;
 };
 
+// Helper function to encode idols for URL
+const encodeIdols = (idols: Idol[]): string => {
+  // Split idols into placed and inventory
+  const data = {
+    p: idols
+      .filter((idol) => idol.position)
+      .map((idol) => [
+        idol.name,
+        [idol.size.width, idol.size.height],
+        [idol.position!.x, idol.position!.y],
+        idol.modifiers.map((m) => [m.type === 'prefix' ? 0 : 1, m.code]),
+      ]),
+    i: idols
+      .filter((idol) => !idol.position)
+      .map((idol) => [
+        idol.name,
+        [idol.size.width, idol.size.height],
+        idol.modifiers.map((m) => [m.type === 'prefix' ? 0 : 1, m.code]),
+      ]),
+  };
+
+  return compressToEncodedURIComponent(JSON.stringify(data));
+};
+
+// Helper function to decode idols from URL
+const decodeIdols = (encoded: string): Idol[] => {
+  try {
+    const decompressed = decompressFromEncodedURIComponent(encoded);
+    if (!decompressed) return [];
+
+    const decoded = JSON.parse(decompressed);
+
+    // Decode placed idols
+    const placedIdols = (decoded.p || []).map((d: any) => ({
+      id: createId(),
+      name: d[0],
+      size: { width: d[1][0], height: d[1][1] },
+      position: { x: d[2][0], y: d[2][1] },
+      modifiers: d[3].map((m: any) => ({
+        id: createId(),
+        type: m[0] === 0 ? 'prefix' : 'suffix',
+        text: '', // We'll need to look this up from the modifier data
+        code: m[1],
+      })),
+    }));
+
+    // Decode inventory idols
+    const inventoryIdols = (decoded.i || []).map((d: any) => ({
+      id: createId(),
+      name: d[0],
+      size: { width: d[1][0], height: d[1][1] },
+      modifiers: d[2].map((m: any) => ({
+        id: createId(),
+        type: m[0] === 0 ? 'prefix' : 'suffix',
+        text: '', // We'll need to look this up from the modifier data
+        code: m[1],
+      })),
+    }));
+
+    return [...placedIdols, ...inventoryIdols];
+  } catch (e) {
+    console.error('Failed to decode idols from URL:', e);
+    return [];
+  }
+};
+
 function App() {
   const [isInventoryCollapsed, setIsInventoryCollapsed] = useState(true);
   const [isConfigFormOpen, setIsConfigFormOpen] = useState(false);
   const [idols, setIdols] = useState<Idol[]>([]);
   const [grid, setGrid] = useState<Grid>(INITIAL_GRID);
+
+  // Load initial state from URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const encodedIdols = params.get('idols');
+    if (encodedIdols) {
+      setIdols(decodeIdols(encodedIdols));
+    }
+  }, []);
+
+  // Update URL when state changes
+  useEffect(() => {
+    if (idols.length > 0) {
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.set('idols', encodeIdols(idols));
+      window.history.replaceState({}, '', newUrl);
+    } else {
+      // Clear URL params if no idols exist
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, [idols]);
 
   const handleCellClick = (cell: GridCell) => {
     if (!cell.isActive) return;
@@ -94,12 +183,12 @@ function App() {
     modifiers: { type: ModifierType; text: string; code: string }[] = []
   ) => {
     const newIdol: Idol = {
-      id: crypto.randomUUID(),
+      id: createId(),
       name,
       size,
       modifiers: modifiers.map((mod) => ({
         ...mod,
-        id: crypto.randomUUID(),
+        id: createId(),
       })),
     };
 
@@ -146,9 +235,9 @@ function App() {
       // Create a new instance of the idol with a new ID and position
       const newIdol: Idol = {
         ...idol,
-        id: crypto.randomUUID(),
+        id: createId(),
         position: { x: cell.x, y: cell.y },
-        modifiers: [...idol.modifiers],
+        modifiers: idol.modifiers.map((m) => ({ ...m, id: createId() })),
       };
       setIdols((prev) => [...prev, newIdol]);
     }
