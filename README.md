@@ -133,18 +133,24 @@ The Idol system in Path of Exile allows players to socket special items called "
 
 ### Phase 3: Idol Configuration (Next)
 
-- [ ] Configuration Panel UI
-  - [ ] Basic form layout
-  - [ ] Size selector (dropdown/buttons)
-  - [ ] Label/name input
-  - [ ] Preview component
-  - [ ] Save/cancel buttons
-- [ ] Idol Template Management
-  - [ ] Create new template
-  - [ ] Template validation
-  - [ ] Save template to inventory
+- [x] Configuration Panel UI
+  - [x] Basic form layout
+  - [x] Size selector (dropdown/buttons)
+  - [x] Label/name input
+  - [x] Basic preview
+  - [x] Save/cancel buttons
+  - [x] Form validation
+- [x] Idol Template Management
+  - [x] Create new template
+  - [x] Template validation
+  - [x] Save template to inventory
   - [ ] Edit existing template
   - [ ] Delete template confirmation
+- [ ] Modifier System
+  - [ ] Prefix/suffix selector
+  - [ ] Modifier input fields
+  - [ ] Modifier validation
+  - [ ] Preview in template card
 
 ### Phase 4: Drag and Drop
 
@@ -216,12 +222,8 @@ The Idol system in Path of Exile allows players to socket special items called "
 
 ## Current Focus
 
-Moving from Phase 2 (Inventory UI) to Phase 3 (Idol Configuration). Next steps:
+Moving from Phase 3 (Idol Configuration) to Phase 4 (Drag and Drop). Next steps:
 
-1. Implement idol configuration form
-2. Add idol preview
-   Currently implementing Phase 1: Core Grid Implementation. Next steps:
-
-3. Complete grid cell interactions
-4. Set up basic layout structure
-5. Begin idol configuration panel
+1. Implement drag and drop functionality for idols
+2. Add placement validation
+3. Handle idol placement on the grid

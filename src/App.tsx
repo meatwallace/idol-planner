@@ -1,10 +1,13 @@
 import { IdolGrid } from './components/Grid';
 import { IdolInventory } from './components/IdolInventory';
-import { GridCell } from './types';
+import { IdolConfigForm } from './components/IdolConfigForm';
+import { GridCell, Idol } from './types';
 import { useState } from 'react';
 
 function App() {
   const [isInventoryExpanded, setIsInventoryExpanded] = useState(false);
+  const [isConfigFormOpen, setIsConfigFormOpen] = useState(false);
+  const [idols, setIdols] = useState<Idol[]>([]);
 
   const handleCellClick = (cell: GridCell) => {
     if (!cell.isActive) return;
@@ -12,7 +15,18 @@ function App() {
   };
 
   const handleCreateIdol = () => {
-    console.log('Create idol clicked');
+    setIsConfigFormOpen(true);
+  };
+
+  const handleAddIdol = (name: string, size: { width: number; height: number }) => {
+    const newIdol: Idol = {
+      id: crypto.randomUUID(),
+      name,
+      size,
+    };
+
+    setIdols((prev) => [...prev, newIdol]);
+    setIsConfigFormOpen(false);
   };
 
   return (
@@ -35,16 +49,27 @@ function App() {
 
         {/* Main Content */}
         <main className='flex-1 flex relative'>
-          {/* Grid Container */}
-          <div className='flex-1 flex items-start justify-center p-8'>
-            <div className='w-[300px]'>
-              <IdolGrid onCellClick={handleCellClick} />
+          {/* Left Side - Grid and Form */}
+          <div className='flex-1 flex flex-col'>
+            {/* Grid Container */}
+            <div className='flex-1 flex items-start justify-center p-8'>
+              <div className='w-[300px]'>
+                <IdolGrid onCellClick={handleCellClick} />
+              </div>
             </div>
+
+            {/* Configuration Form */}
+            <IdolConfigForm
+              isOpen={isConfigFormOpen}
+              onClose={() => setIsConfigFormOpen(false)}
+              onAddIdol={handleAddIdol}
+            />
           </div>
 
           {/* Inventory Sidebar */}
           <div className='z-20 relative'>
             <IdolInventory
+              idols={idols}
               onCreateIdol={handleCreateIdol}
               onExpandChange={setIsInventoryExpanded}
             />

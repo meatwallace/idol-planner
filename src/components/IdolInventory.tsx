@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Plus } from 'react-feather';
+import { Idol } from '../types';
 
 interface IdolInventoryProps {
+  idols: Idol[];
   onCreateIdol: () => void;
   onExpandChange: (isExpanded: boolean) => void;
 }
 
-export const IdolInventory: React.FC<IdolInventoryProps> = ({ onCreateIdol, onExpandChange }) => {
+export const IdolInventory: React.FC<IdolInventoryProps> = ({
+  idols,
+  onCreateIdol,
+  onExpandChange,
+}) => {
   const [isCollapsed, setIsCollapsed] = useState(true);
 
   // Notify parent of expand/collapse changes
@@ -47,12 +53,30 @@ export const IdolInventory: React.FC<IdolInventoryProps> = ({ onCreateIdol, onEx
           </div>
 
           {!isCollapsed && (
-            <div className='flex-1 p-4 text-stone-400 text-sm text-center flex items-center justify-center'>
-              <div>
-                No idols created yet.
-                <br />
-                Click the + button to create one.
-              </div>
+            <div className='flex-1 p-4'>
+              {idols.length === 0 ? (
+                <div className='text-stone-400 text-sm text-center flex items-center justify-center h-full'>
+                  <div>
+                    No idols created yet.
+                    <br />
+                    Click the + button to create one.
+                  </div>
+                </div>
+              ) : (
+                <div className='space-y-2'>
+                  {idols.map((idol) => (
+                    <div
+                      key={idol.id}
+                      className='bg-stone-800 rounded p-2 border border-stone-700 hover:border-amber-600 cursor-pointer'
+                    >
+                      <div className='text-sm font-medium'>{idol.name}</div>
+                      <div className='text-xs text-stone-400'>
+                        {idol.size.width}x{idol.size.height}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -23,6 +23,7 @@ export type IdolSize = {
 
 export type Idol = {
   id: string;
+  name: string;
   size: IdolSize;
   position?: {
     x: number;
