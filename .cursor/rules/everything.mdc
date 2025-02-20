@@ -1,0 +1,9 @@
+---
+description: General prototyping rules
+globs: *
+---
+Respect these rules while implementing code:
+
+* Use Yarn v2 PnP for package management
+* Prefer working out of the single [App.tsx](mdc:src/App.tsx) file to maintain context
+* Use tailwind for styles
